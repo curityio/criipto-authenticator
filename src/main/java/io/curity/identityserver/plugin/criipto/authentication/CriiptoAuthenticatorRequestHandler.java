@@ -95,28 +95,42 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     {
         _config.getCountry().getSweden().ifPresent(options ->
         {
-            if (options.isLoginOnSameDevice().get())
+            options.isLoginOnOtherDevice().ifPresent(isOptionSelected ->
             {
-                acrValues.add("urn:grn:authn:se:bankid:same-device");
-            }
+                if (isOptionSelected)
+                {
+                    acrValues.add("urn:grn:authn:se:bankid:same-device");
+                }
+            });
 
-            if (options.isLoginOnOtherDevice().get())
+            options.isLoginOnSameDevice().ifPresent(isOptionSelected ->
             {
-                acrValues.add("urn:grn:authn:se:bankid:another-device");
-            }
+                if (isOptionSelected)
+                {
+                    acrValues.add("urn:grn:authn:se:bankid:another-device");
+                }
+            });
         });
+
         _config.getCountry().getNorway().ifPresent(options ->
         {
-            if (options.isLoginOnMobileDevice().get())
+            options.isLoginOnMobileDevice().ifPresent(isOptionSelected ->
             {
-                acrValues.add("urn:grn:authn:no:bankid:mobile");
-            }
+                if (isOptionSelected)
+                {
+                    acrValues.add("urn:grn:authn:no:bankid:mobile");
+                }
+            });
 
-            if (options.isLoginWithHardwareToken().get())
+            options.isLoginWithHardwareToken().ifPresent(isOptionSelected ->
             {
-                acrValues.add("urn:grn:authn:no:bankid:central");
-            }
+                if (isOptionSelected)
+                {
+                    acrValues.add("urn:grn:authn:no:bankid:central");
+                }
+            });
         });
+
         _config.getCountry().getDenmark().ifPresent(options ->
         {
             acrValues.add("urn:grn:authn:dk:nemid:poces");
