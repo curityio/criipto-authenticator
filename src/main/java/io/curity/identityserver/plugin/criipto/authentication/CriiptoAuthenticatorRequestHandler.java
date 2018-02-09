@@ -46,7 +46,7 @@ import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenti
 public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestHandler<Request>
 {
     private static final Logger _logger = LoggerFactory.getLogger(CriiptoAuthenticatorRequestHandler.class);
-    private static final String AUTHORIZATION_ENDPOINT = "https://criipto.com/oauth/authorize";
+    private final String AUTHORIZATION_ENDPOINT;
 
     private final CriiptoAuthenticatorPluginConfig _config;
     private final AuthenticatorInformationProvider _authenticatorInformationProvider;
@@ -57,6 +57,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         _config = config;
         _exceptionFactory = config.getExceptionFactory();
         _authenticatorInformationProvider = config.getAuthenticatorInformationProvider();
+        AUTHORIZATION_ENDPOINT = "https://" + _config.getDomain() + "/oauth2/authorize";
     }
 
     @Override
@@ -68,6 +69,10 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         String state = UUID.randomUUID().toString();
         Map<String, Collection<String>> queryStringArguments = new LinkedHashMap<>(5);
         Set<String> scopes = new LinkedHashSet<>(7);
+        Set<String> acrValues = new LinkedHashSet<>(2);
+
+        scopes.add("openid");
+        setAcrValues(acrValues);
 
         _config.getSessionManager().put(Attribute.of("state", state));
 
@@ -77,12 +82,45 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         queryStringArguments.put("response_type", Collections.singleton("code"));
 
         queryStringArguments.put("scope", Collections.singleton(String.join(" ", scopes)));
+        queryStringArguments.put("acr_values", Collections.singleton(String.join(" ", acrValues)));
 
         _logger.debug("Redirecting to {} with query string arguments {}", AUTHORIZATION_ENDPOINT,
                 queryStringArguments);
 
         throw _exceptionFactory.redirectException(AUTHORIZATION_ENDPOINT,
                 RedirectStatusCode.MOVED_TEMPORARILY, queryStringArguments, false);
+    }
+
+    private void setAcrValues(Set<String> acrValues)
+    {
+        _config.getCountry().getSweden().ifPresent(options ->
+        {
+            if (options.isLoginOnSameDevice().get())
+            {
+                acrValues.add("urn:grn:authn:se:bankid:same-device");
+            }
+
+            if (options.isLoginOnOtherDevice().get())
+            {
+                acrValues.add("urn:grn:authn:se:bankid:another-device");
+            }
+        });
+        _config.getCountry().getNorway().ifPresent(options ->
+        {
+            if (options.isLoginOnMobileDevice().get())
+            {
+                acrValues.add("urn:grn:authn:no:bankid:mobile");
+            }
+
+            if (options.isLoginWithHardwareToken().get())
+            {
+                acrValues.add("urn:grn:authn:no:bankid:central");
+            }
+        });
+        _config.getCountry().getDenmark().ifPresent(options ->
+        {
+            acrValues.add("urn:grn:authn:dk:nemid:poces");
+        });
     }
 
     private String createRedirectUri()
@@ -92,8 +130,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             URI authUri = _authenticatorInformationProvider.getFullyQualifiedAuthenticationUri();
 
             return new URL(authUri.toURL(), authUri.getPath() + "/" + CALLBACK).toString();
-        }
-        catch (MalformedURLException e)
+        } catch (MalformedURLException e)
         {
             throw _exceptionFactory.internalServerException(ErrorCode.INVALID_REDIRECT_URI,
                     "Could not create redirect URI");

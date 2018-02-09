@@ -19,7 +19,6 @@ package io.curity.identityserver.plugin.criipto.config;
 import se.curity.identityserver.sdk.config.Configuration;
 import se.curity.identityserver.sdk.config.OneOf;
 import se.curity.identityserver.sdk.config.annotation.DefaultBoolean;
-import se.curity.identityserver.sdk.config.annotation.DefaultEnum;
 import se.curity.identityserver.sdk.config.annotation.Description;
 import se.curity.identityserver.sdk.service.ExceptionFactory;
 import se.curity.identityserver.sdk.service.HttpClient;
@@ -33,14 +32,49 @@ import java.util.Optional;
 @SuppressWarnings("InterfaceNeverImplemented")
 public interface CriiptoAuthenticatorPluginConfig extends Configuration
 {
-    @Description("The client applications identifier")
+
+    @Description("The Client ID/realm of the application configured in Criipto for Curity")
     String getClientId();
 
-    @Description("The secret of the client application")
+    @Description("The associated secret for the client configured for Curity in Criipto")
     String getClientSecret();
 
-    @Description("The HTTP client with any proxy and TLS settings that will be used to connect to criipto")
+    @Description("The HTTP client with any proxy and TLS settings that will be used to connect to Criipto")
     Optional<HttpClient> getHttpClient();
+
+    @Description("The domain or tenant ID at Criipto")
+    String getDomain();
+
+    Country getCountry();
+
+    interface Country extends OneOf
+    {
+
+        Optional<Sweden> getSweden();
+
+        Optional<Norway> getNorway();
+
+        Optional<String> getDenmark();
+
+
+        interface Sweden
+        {
+            @Description("Login on same device")
+            Optional<@DefaultBoolean(false) Boolean> isLoginOnSameDevice();
+
+            @Description("Login on other device")
+            Optional<@DefaultBoolean(false) Boolean> isLoginOnOtherDevice();
+        }
+
+        interface Norway
+        {
+            @Description("Login on mobile device")
+            Optional<@DefaultBoolean(false) Boolean> isLoginOnMobileDevice();
+
+            @Description("Login with hardware token")
+            Optional<@DefaultBoolean(false) Boolean> isLoginWithHardwareToken();
+        }
+    }
 
     SessionManager getSessionManager();
 
