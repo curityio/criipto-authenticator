@@ -99,7 +99,12 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             {
                 if (isOptionSelected)
                 {
-                    acrValues.add("urn:grn:authn:se:bankid:same-device");
+                    String acr = "urn:grn:authn:se:bankid:another-device";
+
+                    _logger.debug("Adding ACR ({}) that will cause Criipto to perform Swedish BankID login on a " +
+                            "different device", acr);
+
+                    acrValues.add(acr);
                 }
             });
 
@@ -107,7 +112,12 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             {
                 if (isOptionSelected)
                 {
-                    acrValues.add("urn:grn:authn:se:bankid:another-device");
+                    String acr = "urn:grn:authn:se:bankid:same-device";
+
+                    _logger.debug("Adding ACR ({}) that will cause Criipto to perform Swedish BankID login on the " +
+                            "same device", acr);
+
+                    acrValues.add(acr);
                 }
             });
         });
@@ -118,7 +128,12 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             {
                 if (isOptionSelected)
                 {
-                    acrValues.add("urn:grn:authn:no:bankid:mobile");
+                    String acr = "urn:grn:authn:no:bankid:mobile";
+
+                    _logger.debug("Adding ACR ({}) that will cause Criipto to perform Norwegian BankID login on a " +
+                            "mobile device", acr);
+
+                    acrValues.add(acr);
                 }
             });
 
@@ -126,14 +141,23 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             {
                 if (isOptionSelected)
                 {
-                    acrValues.add("urn:grn:authn:no:bankid:central");
+                    String acr = "urn:grn:authn:no:bankid:central";
+
+                    _logger.debug("Adding ACR ({}) that will cause Criipto to perform Norwegian BankID login using " +
+                            "a hardware device", acr);
+
+                    acrValues.add(acr);
                 }
             });
         });
 
         _config.getCountry().getDenmark().ifPresent(options ->
         {
-            acrValues.add("urn:grn:authn:dk:nemid:poces");
+            String acr = "urn:grn:authn:dk:nemid:poces";
+
+            _logger.debug("Adding ACR ({}) that will cause Criipto to perform Danish BankID login", acr);
+
+            acrValues.add(acr);
         });
     }
 
