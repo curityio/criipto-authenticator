@@ -17,6 +17,7 @@
 package io.curity.identityserver.plugin.criipto.authentication;
 
 import io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig;
+import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.curity.identityserver.sdk.Nullable;
@@ -43,12 +44,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import static se.curity.identityserver.sdk.attribute.ContextAttributes.AUTH_TIME;
 
 public class CallbackRequestHandler implements AuthenticatorRequestHandler<CallbackGetRequestModel>
 {
@@ -95,26 +98,45 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         handleError(requestModel);
 
         Map<String, Object> tokenResponseData = redeemCodeForTokens(requestModel);
-        @Nullable Object accessToken = tokenResponseData.get("access_token");
-        List<Attribute> subjectAttributes = new LinkedList<>(), contextAttributes = new LinkedList<>();
-        String userId = tokenResponseData.get("user_id").toString();
 
-        subjectAttributes.add(Attribute.of("user_id", userId));
+        try
+        {
+            //parse claims without need of key
+            Map claimsMap = new JwtConsumerBuilder().setSkipAllValidators().setDisableRequireSignature().setSkipSignatureVerification().build().processToClaims(tokenResponseData.get("id_token").toString()).getClaimsMap();
 
-        contextAttributes.add(Attribute.of("criipto_access_token", accessToken.toString()));
-        contextAttributes.add(Attribute.of("granted_scopes", tokenResponseData.get("scope").toString()));
+            String[] userId = new String[1];
+            _config.getCountry().getSweden().ifPresent(sweden ->
+            {
+                userId[0]= claimsMap.get("ssn").toString();
+            });
+            _config.getCountry().getNorway().ifPresent(norway ->
+            {
+                userId[0]= claimsMap.get("socialno").toString();
+            });
+            _config.getCountry().getDenmark().ifPresent(denmark ->
+            {
+                userId[0]= claimsMap.get("cprNumberIdentifier").toString();
+            });
 
-        AuthenticationAttributes authenticationAttributes = AuthenticationAttributes.of(
-                SubjectAttributes.of(userId, Attributes.of(subjectAttributes)),
-                ContextAttributes.of(contextAttributes));
+            Attributes subjectAttributes = Attributes.of(Attribute.of("ssn", userId[0]), Attribute.of("name", claimsMap.get("name").toString()));
+            Attributes contextAttributes = Attributes.of(Attribute.of("criipto_access_token", tokenResponseData.get("access_token").toString()),
+                    Attribute.of("id_token", tokenResponseData.get("id_token").toString()));
+            AuthenticationAttributes attributes = AuthenticationAttributes.of(
+                    SubjectAttributes.of(userId[0], subjectAttributes),
+                    ContextAttributes.of(contextAttributes));
+            AuthenticationResult authenticationResult = new AuthenticationResult(attributes);
+            return Optional.ofNullable(authenticationResult);
+        } catch (Exception e)
+        {
+            throw _exceptionFactory.internalServerException(ErrorCode.EXTERNAL_SERVICE_ERROR, "Invalid token " + e.getMessage());
+        }
 
-        return Optional.of(new AuthenticationResult(authenticationAttributes));
     }
 
     private Map<String, Object> redeemCodeForTokens(CallbackGetRequestModel requestModel)
     {
         HttpResponse tokenResponse = getWebServiceClient()
-                .withPath("/api/oauth.access")
+                .withPath("/oauth2/token")
                 .request()
                 .contentType("application/x-www-form-urlencoded")
                 .body(getFormEncodedBodyFrom(createPostData(_config.getClientId(), _config.getClientSecret(),
@@ -143,11 +165,11 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
 
         if (httpClient.isPresent())
         {
-            return _webServiceClientFactory.create(httpClient.get()).withHost("criipto.com");
+            return _webServiceClientFactory.create(httpClient.get()).withHost(_config.getDomain());
         }
         else
         {
-            return _webServiceClientFactory.create(URI.create("https://criipto.com"));
+            return _webServiceClientFactory.create(URI.create("https://" + _config.getDomain()));
         }
     }
 

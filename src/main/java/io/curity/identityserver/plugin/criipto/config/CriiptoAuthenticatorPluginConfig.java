@@ -54,7 +54,7 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
 
         Optional<Norway> getNorway();
 
-        Optional<String> getDenmark();
+        Optional<Denmark> getDenmark();
 
 
         interface Sweden
@@ -73,6 +73,12 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
 
             @Description("Login with hardware token")
             Optional<@DefaultBoolean(false) Boolean> isLoginWithHardwareToken();
+        }
+
+        interface Denmark
+        {
+            //TODO: Need to remove this statement, as the empty interface should work.
+            Optional<@DefaultBoolean(true) Boolean> isDenmark();
         }
     }
 
