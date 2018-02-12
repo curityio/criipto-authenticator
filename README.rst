@@ -31,6 +31,10 @@ To install this plug-in, either download a binary version available from the `re
 
     The JAR file needs to be deployed to each run-time node and the admin node. For simple test deployments where the admin node is a run-time node, the JAR file only needs to be copied to one location.
 
+The following JAR must also be added to the same plug-in, so that it is available in the class path of the plug-in. If it is not, a server error will result after login at Criipto with a log message in the server log saying that a certain class provided in that JAR could not be found:
+
+* `jose4j-0.6.2.jar <http://central.maven.org/maven2/org/bitbucket/b_c/jose4j/0.6.2/jose4j-0.6.2.jar>`_
+
 For a more detailed explanation of installing plug-ins, refer to the `Curity developer guide <https://developer.curity.io/docs/latest/developer-guide/plugins/index.html#plugin-installation>`_.
 
 Creating a Criipto Authenticator in Curity
