@@ -18,7 +18,7 @@ package io.curity.identityserver.plugin.criipto.config;
 
 import se.curity.identityserver.sdk.config.Configuration;
 import se.curity.identityserver.sdk.config.OneOf;
-import se.curity.identityserver.sdk.config.annotation.DefaultBoolean;
+import se.curity.identityserver.sdk.config.annotation.DefaultEnum;
 import se.curity.identityserver.sdk.config.annotation.Description;
 import se.curity.identityserver.sdk.service.ExceptionFactory;
 import se.curity.identityserver.sdk.service.HttpClient;
@@ -49,67 +49,49 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
 
     interface Country extends OneOf
     {
-
+        @Description("Login using Swedish BankID")
         Optional<Sweden> getSweden();
 
+        @Description("Login using Norwegian BankID")
         Optional<Norway> getNorway();
 
+        @Description("Login using NemID")
         Optional<Denmark> getDenmark();
-
-
+        
         interface Sweden
         {
-            LoginOnDevice getLoginOnDevice();
+            @Description("How the user should login -- either on the same device or another device")
+            @DefaultEnum("SAME_DEVICE")
+            LoginUsing getLoginUsing();
 
-            interface LoginOnDevice extends OneOf
+            enum LoginUsing
             {
-                Optional<LoginOnSameDevice> isLoginOnSameDevice();
+                @Description("Login on the same device")
+                SAME_DEVICE,
 
-                Optional<LoginOnOtherDevice> isLoginOnOtherDevice();
-
-                interface LoginOnSameDevice
-                {
-                    //TODO: Need to remove this statement, as the empty interface should work.
-                    Optional<@DefaultBoolean(true) Boolean> isLoginOnSameDevice();
-                }
-
-                interface LoginOnOtherDevice
-                {
-                    //TODO: Need to remove this statement, as the empty interface should work.
-                    Optional<@DefaultBoolean(true) Boolean> isLoginOnOtherDevice();
-                }
+                @Description("Login on some other device")
+                OTHER_DEVICE
             }
-
         }
 
         interface Norway
         {
-            LoginOnDevice getLoginOnDevice();
+            @Description("How the user should login -- either on a mobile device or a hardware token")
+            @DefaultEnum("MOBILE_DEVICE")
+            LoginUsing getLoginUsing();
 
-            interface LoginOnDevice extends OneOf
+            enum LoginUsing
             {
-                Optional<LoginOnMobileDevice> isLoginOnMobileDevice();
+                @Description("Login on a mobile device")
+                MOBILE_DEVICE,
 
-                Optional<LoginWithHardwareToken> isLoginWithHardwareToken();
-
-                interface LoginOnMobileDevice
-                {
-                    //TODO: Need to remove this statement, as the empty interface should work.
-                    Optional<@DefaultBoolean(true) Boolean> isLoginOnMobileDevice();
-                }
-
-                interface LoginWithHardwareToken
-                {
-                    //TODO: Need to remove this statement, as the empty interface should work.
-                    Optional<@DefaultBoolean(true) Boolean> isLoginWithHardwareToken();
-                }
+                @Description("Login using a hardware token")
+                HARDWARE_TOKEN
             }
         }
 
         interface Denmark
         {
-            //TODO: Need to remove this statement, as the empty interface should work.
-            Optional<@DefaultBoolean(true) Boolean> isDenmark();
         }
     }
 
