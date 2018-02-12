@@ -95,59 +95,47 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     {
         _config.getCountry().getSweden().ifPresent(options ->
         {
-            options.isLoginOnOtherDevice().ifPresent(isOptionSelected ->
+            options.getLoginOnDevice().isLoginOnOtherDevice().ifPresent(isOptionSelected ->
             {
-                if (isOptionSelected)
-                {
                     String acr = "urn:grn:authn:se:bankid:another-device";
 
                     _logger.debug("Adding ACR ({}) that will cause Criipto to perform Swedish BankID login on a " +
                             "different device", acr);
 
                     acrValues.add(acr);
-                }
             });
 
-            options.isLoginOnSameDevice().ifPresent(isOptionSelected ->
+            options.getLoginOnDevice().isLoginOnSameDevice().ifPresent(isOptionSelected ->
             {
-                if (isOptionSelected)
-                {
                     String acr = "urn:grn:authn:se:bankid:same-device";
 
                     _logger.debug("Adding ACR ({}) that will cause Criipto to perform Swedish BankID login on the " +
                             "same device", acr);
 
                     acrValues.add(acr);
-                }
             });
         });
 
         _config.getCountry().getNorway().ifPresent(options ->
         {
-            options.isLoginOnMobileDevice().ifPresent(isOptionSelected ->
+            options.getLoginOnDevice().isLoginOnMobileDevice().ifPresent(isOptionSelected ->
             {
-                if (isOptionSelected)
-                {
                     String acr = "urn:grn:authn:no:bankid:mobile";
 
                     _logger.debug("Adding ACR ({}) that will cause Criipto to perform Norwegian BankID login on a " +
                             "mobile device", acr);
 
                     acrValues.add(acr);
-                }
             });
 
-            options.isLoginWithHardwareToken().ifPresent(isOptionSelected ->
+            options.getLoginOnDevice().isLoginWithHardwareToken().ifPresent(isOptionSelected ->
             {
-                if (isOptionSelected)
-                {
                     String acr = "urn:grn:authn:no:bankid:central";
 
                     _logger.debug("Adding ACR ({}) that will cause Criipto to perform Norwegian BankID login using " +
                             "a hardware device", acr);
 
                     acrValues.add(acr);
-                }
             });
         });
 

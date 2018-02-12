@@ -59,20 +59,51 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
 
         interface Sweden
         {
-            @Description("Login on same device")
-            Optional<@DefaultBoolean(false) Boolean> isLoginOnSameDevice();
+            LoginOnDevice getLoginOnDevice();
 
-            @Description("Login on other device")
-            Optional<@DefaultBoolean(false) Boolean> isLoginOnOtherDevice();
+            interface LoginOnDevice extends OneOf
+            {
+                Optional<LoginOnSameDevice> isLoginOnSameDevice();
+
+                Optional<LoginOnOtherDevice> isLoginOnOtherDevice();
+
+                interface LoginOnSameDevice
+                {
+                    //TODO: Need to remove this statement, as the empty interface should work.
+                    Optional<@DefaultBoolean(true) Boolean> isLoginOnSameDevice();
+                }
+
+                interface LoginOnOtherDevice
+                {
+                    //TODO: Need to remove this statement, as the empty interface should work.
+                    Optional<@DefaultBoolean(true) Boolean> isLoginOnOtherDevice();
+                }
+            }
+
         }
 
         interface Norway
         {
-            @Description("Login on mobile device")
-            Optional<@DefaultBoolean(false) Boolean> isLoginOnMobileDevice();
+            LoginOnDevice getLoginOnDevice();
 
-            @Description("Login with hardware token")
-            Optional<@DefaultBoolean(false) Boolean> isLoginWithHardwareToken();
+            interface LoginOnDevice extends OneOf
+            {
+                Optional<LoginOnMobileDevice> isLoginOnMobileDevice();
+
+                Optional<LoginWithHardwareToken> isLoginWithHardwareToken();
+
+                interface LoginOnMobileDevice
+                {
+                    //TODO: Need to remove this statement, as the empty interface should work.
+                    Optional<@DefaultBoolean(true) Boolean> isLoginOnMobileDevice();
+                }
+
+                interface LoginWithHardwareToken
+                {
+                    //TODO: Need to remove this statement, as the empty interface should work.
+                    Optional<@DefaultBoolean(true) Boolean> isLoginWithHardwareToken();
+                }
+            }
         }
 
         interface Denmark
