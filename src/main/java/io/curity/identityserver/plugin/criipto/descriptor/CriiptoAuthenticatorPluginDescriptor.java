@@ -52,5 +52,4 @@ public final class CriiptoAuthenticatorPluginDescriptor
 
         return Collections.unmodifiableMap(handlers);
     }
-
 }

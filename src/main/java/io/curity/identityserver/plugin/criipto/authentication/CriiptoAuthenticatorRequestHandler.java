@@ -67,9 +67,9 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
         String redirectUri = createRedirectUri();
         String state = UUID.randomUUID().toString();
-        Map<String, Collection<String>> queryStringArguments = new LinkedHashMap<>(5);
-        Set<String> scopes = new LinkedHashSet<>(7);
-        Set<String> acrValues = new LinkedHashSet<>(2);
+        Map<String, Collection<String>> queryStringArguments = new LinkedHashMap<>(6);
+        Set<String> scopes = new LinkedHashSet<>(2);
+        Set<String> acrValues = new LinkedHashSet<>(1);
 
         scopes.add("openid");
         setAcrValues(acrValues);

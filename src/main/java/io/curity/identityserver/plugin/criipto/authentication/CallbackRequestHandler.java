@@ -98,35 +98,49 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         try
         {
             //parse claims without need of key
-            Map claimsMap = new JwtConsumerBuilder().setSkipAllValidators().setDisableRequireSignature().setSkipSignatureVerification().build().processToClaims(tokenResponseData.get("id_token").toString()).getClaimsMap();
+            Map claimsMap = new JwtConsumerBuilder()
+                    .setSkipAllValidators()
+                    .setDisableRequireSignature()
+                    .setSkipSignatureVerification()
+                    .build()
+                    .processToClaims(tokenResponseData.get("id_token").toString()).getClaimsMap();
 
-            String[] userId = new String[1];
+            String[] userId = new String[1]; // Lambdas need data that is effectively final. String isn't; array is.
+
             _config.getCountry().getSweden().ifPresent(sweden ->
             {
-                userId[0]= claimsMap.get("ssn").toString();
-            });
-            _config.getCountry().getNorway().ifPresent(norway ->
-            {
-                userId[0]= claimsMap.get("socialno").toString();
-            });
-            _config.getCountry().getDenmark().ifPresent(denmark ->
-            {
-                userId[0]= claimsMap.get("cprNumberIdentifier").toString();
+                userId[0] = claimsMap.get("ssn").toString();
             });
 
-            Attributes subjectAttributes = Attributes.of(Attribute.of("ssn", userId[0]), Attribute.of("name", claimsMap.get("name").toString()));
-            Attributes contextAttributes = Attributes.of(Attribute.of("criipto_access_token", tokenResponseData.get("access_token").toString()),
-                    Attribute.of("id_token", tokenResponseData.get("id_token").toString()));
+            _config.getCountry().getNorway().ifPresent(norway ->
+            {
+                userId[0] = claimsMap.get("socialno").toString();
+            });
+
+            _config.getCountry().getDenmark().ifPresent(denmark ->
+            {
+                userId[0] = claimsMap.get("cprNumberIdentifier").toString();
+            });
+
+            Attributes subjectAttributes = Attributes.of(
+                    Attribute.of("ssn", userId[0]),
+                    Attribute.of("name", claimsMap.get("name").toString()));
+
+            Attributes contextAttributes = Attributes.of(
+                    Attribute.of("criipto_access_token", tokenResponseData.get("access_token").toString()),
+                    Attribute.of("criipto_id_token", tokenResponseData.get("id_token").toString()));
+
             AuthenticationAttributes attributes = AuthenticationAttributes.of(
                     SubjectAttributes.of(userId[0], subjectAttributes),
                     ContextAttributes.of(contextAttributes));
-            AuthenticationResult authenticationResult = new AuthenticationResult(attributes);
-            return Optional.ofNullable(authenticationResult);
-        } catch (Exception e)
-        {
-            throw _exceptionFactory.internalServerException(ErrorCode.EXTERNAL_SERVICE_ERROR, "Invalid token " + e.getMessage());
-        }
 
+            return Optional.of(new AuthenticationResult(attributes));
+        }
+        catch (Exception e)
+        {
+            throw _exceptionFactory.internalServerException(ErrorCode.EXTERNAL_SERVICE_ERROR,
+                    "Invalid token " + e.getMessage());
+        }
     }
 
     private Map<String, Object> redeemCodeForTokens(CallbackGetRequestModel requestModel)
