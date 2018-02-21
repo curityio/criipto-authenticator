@@ -23,7 +23,7 @@
     data.error = "$!error";
     data.error_description = "$!error_description";
 
-    parent.postMessage(data, "*");
+    parent.handleUserData(data);
 
 </script>
 #end

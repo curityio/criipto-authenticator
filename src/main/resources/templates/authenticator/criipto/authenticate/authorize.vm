@@ -17,15 +17,14 @@
 #define ($_body)
     #parse("fragments/jquery")
 <script type="text/javascript" $!nonceAttr>
-    window.addEventListener("message", function (event) {
-        if (event.origin === window.origin && event.data && event.data.hasOwnProperty("code")) {
-            addField("code", event.data.code);
-            addField("state", event.data.state);
-            addField("error", event.data.error);
-            addField("error_description", event.data.error_description);
-            $("#dataForm").submit();
-        }
-    }, false)
+
+    function handleUserData(data) {
+        addField("code", data.code);
+        addField("state", data.state);
+        addField("error", data.error);
+        addField("error_description", data.error_description);
+        $("#dataForm").submit();
+    }
 
     function addField(name, value) {
         if (value) {
