@@ -47,7 +47,6 @@ import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticato
 import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig.Country.Sweden.LoginUsing.OTHER_DEVICE;
 import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CALLBACK;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
 import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseModel;
 
 public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestHandler<RequestModel>
@@ -238,27 +237,30 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     @Override
     public RequestModel preProcess(Request request, Response response)
     {
+        final boolean[] showForm = {false};
+        _config.getCountry().getNorway().ifPresent(item ->
+        {
+            if (item.getLoginUsing() == MOBILE_DEVICE)
+            {
+                setResponseData(response, "phoneNumber");
+                showForm[0] = true;
+            }
+        });
+        _config.getCountry().getSweden().ifPresent(item ->
+        {
+            if (item.getLoginUsing() == OTHER_DEVICE)
+            {
+                setResponseData(response, "personalNumber");
+                showForm[0] = true;
+            }
+        });
         if (request.isGetRequest())
         {
-            // GET request
-            _config.getCountry().getNorway().ifPresent(item ->
+            if (showForm[0])
             {
-                if (item.getLoginUsing() == MOBILE_DEVICE)
-                {
-                    response.setResponseModel(templateResponseModel(singletonMap("phoneNumber", _config.getUserPreferenceManager().getUsername()), "authenticate/get"),
-                            Response.ResponseModelScope.NOT_FAILURE);
-                    response.putViewData("selectedForm", "phoneNumber", HttpStatus.OK);
-                }
-            });
-            _config.getCountry().getSweden().ifPresent(item ->
-            {
-                if (item.getLoginUsing() == OTHER_DEVICE)
-                {
-                    response.setResponseModel(templateResponseModel(singletonMap("personalNumber", _config.getUserPreferenceManager().getUsername()), "authenticate/get"),
-                            Response.ResponseModelScope.NOT_FAILURE);
-                    response.putViewData("selectedForm", "personalNumber", HttpStatus.OK);
-                }
-            });
+                response.setResponseModel(templateResponseModel(emptyMap(), "authenticate/get"),
+                        Response.ResponseModelScope.NOT_FAILURE);
+            }
         }
 
         // on request validation failure, we should use the same template as for NOT_FAILURE
@@ -266,6 +268,12 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 "authenticate/get"), HttpStatus.BAD_REQUEST);
 
         return new RequestModel(request, response);
+    }
+
+    private void setResponseData(Response response, String formValue)
+    {
+        response.putViewData("selectedForm", formValue, HttpStatus.OK);
+        response.putViewData("selectedForm", formValue, HttpStatus.BAD_REQUEST);
     }
 
     @Override
