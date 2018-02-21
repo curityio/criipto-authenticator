@@ -24,7 +24,6 @@ import se.curity.identityserver.sdk.authentication.AuthenticationResult;
 import se.curity.identityserver.sdk.authentication.AuthenticatorRequestHandler;
 import se.curity.identityserver.sdk.errors.ErrorCode;
 import se.curity.identityserver.sdk.http.HttpStatus;
-import se.curity.identityserver.sdk.http.RedirectStatusCode;
 import se.curity.identityserver.sdk.service.ExceptionFactory;
 import se.curity.identityserver.sdk.service.authentication.AuthenticatorInformationProvider;
 import se.curity.identityserver.sdk.web.Request;
@@ -36,6 +35,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -47,6 +47,7 @@ import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticato
 import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig.Country.Sweden.LoginUsing.OTHER_DEVICE;
 import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CALLBACK;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseModel;
 
 public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestHandler<RequestModel>
@@ -89,12 +90,22 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
         if (isRedirect[0])
         {
-            redirectToAuthorization(requestModel);
+            redirectToAuthorization(requestModel, response);
         }
         return Optional.empty();
     }
 
-    private void redirectToAuthorization(RequestModel requestModel)
+    private String buildUrl(String endpoint, Map<String, Collection<String>> queryStringArguments)
+    {
+        final Set<String> query = new HashSet<>();
+        queryStringArguments.forEach((key, item) ->
+        {
+            query.add(key + "=" + String.join(" ", item));
+        });
+        return endpoint + "?" + String.join("&", query);
+    }
+
+    private void redirectToAuthorization(RequestModel requestModel, Response response)
     {
 
         String redirectUri = createRedirectUri();
@@ -135,8 +146,10 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         _logger.debug("Redirecting to {} with query string arguments {}", AUTHORIZATION_ENDPOINT,
                 queryStringArguments);
 
-        throw _exceptionFactory.redirectException(AUTHORIZATION_ENDPOINT,
-                RedirectStatusCode.MOVED_TEMPORARILY, queryStringArguments, false);
+        String authorizeUrl = buildUrl(AUTHORIZATION_ENDPOINT, queryStringArguments);
+
+        response.setResponseModel(templateResponseModel(singletonMap("authorizeUrl", authorizeUrl), "authenticate/authorize"),
+                Response.ResponseModelScope.NOT_FAILURE);
     }
 
     private void setAcrValues(Set<String> acrValues)
@@ -228,7 +241,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     {
         if (request.getPostRequestModel().getPersonalNumber() != null || request.getPostRequestModel().getPhoneNumber() != null)
         {
-            redirectToAuthorization(request);
+            redirectToAuthorization(request, response);
         }
         return Optional.empty();
     }

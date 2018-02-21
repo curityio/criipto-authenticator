@@ -21,7 +21,7 @@ import se.curity.identityserver.sdk.web.Request;
 
 import java.util.function.Function;
 
-class CallbackGetRequestModel
+class CallbackRequestModel
 {
     @Nullable
     private final String _error;
@@ -33,16 +33,28 @@ class CallbackGetRequestModel
     private final String _code;
     private final String _state;
 
-    CallbackGetRequestModel(Request request)
+    CallbackRequestModel(Request request)
     {
         Function<String, ? extends RuntimeException> invalidParameter = (s) -> new RuntimeException(String.format(
                 "Expected only one query string parameter named %s, but found multiple.", s));
+        _code = getParameterValue("code", invalidParameter, request);
+        _state = getParameterValue("state", invalidParameter, request);
+        _error = getParameterValue("error", invalidParameter, request);
+        _errorDescription = getParameterValue("error_description", invalidParameter, request);
 
-        _code = request.getQueryParameterValueOrError("code", invalidParameter);
-        _state = request.getQueryParameterValueOrError("state", invalidParameter);
-        _error = request.getQueryParameterValueOrError("error", invalidParameter);
-        _errorDescription = request.getQueryParameterValueOrError("error_description", invalidParameter);
         _url = request.getUrl();
+    }
+
+    private String getParameterValue(String name, Function<String, ? extends RuntimeException> invalidParameter, Request request)
+    {
+        if (request.isPostRequest())
+        {
+            return request.getFormParameterValueOrError(name, invalidParameter);
+        }
+        else
+        {
+            return request.getQueryParameterValueOrError(name, invalidParameter);
+        }
     }
 
     public String getCode()

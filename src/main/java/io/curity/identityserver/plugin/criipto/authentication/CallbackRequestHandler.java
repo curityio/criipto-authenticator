@@ -49,7 +49,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CallbackRequestHandler implements AuthenticatorRequestHandler<CallbackGetRequestModel>
+import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseModel;
+
+public class CallbackRequestHandler implements AuthenticatorRequestHandler<CallbackRequestModel>
 {
     private final static Logger _logger = LoggerFactory.getLogger(CallbackRequestHandler.class);
 
@@ -69,26 +71,36 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
     }
 
     @Override
-    public CallbackGetRequestModel preProcess(Request request, Response response)
+    public CallbackRequestModel preProcess(Request request, Response response)
     {
+        CallbackRequestModel requestModel = new CallbackRequestModel(request);
         if (request.isGetRequest())
         {
-            return new CallbackGetRequestModel(request);
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("code", requestModel.getCode());
+            dataMap.put("state", requestModel.getState());
+            dataMap.put("error", requestModel.getError());
+            dataMap.put("error_description", requestModel.getErrorDescription());
+
+            response.setResponseModel(templateResponseModel(dataMap, "authenticate/callback"),
+                    Response.ResponseModelScope.NOT_FAILURE);
         }
-        else
-        {
-            throw _exceptionFactory.methodNotAllowed();
-        }
+        return requestModel;
     }
 
     @Override
-    public Optional<AuthenticationResult> post(CallbackGetRequestModel requestModel, Response response)
+    public Optional<AuthenticationResult> post(CallbackRequestModel requestModel, Response response)
     {
-        throw _exceptionFactory.methodNotAllowed();
+        return handleCallbackResponse(requestModel);
     }
 
     @Override
-    public Optional<AuthenticationResult> get(CallbackGetRequestModel requestModel, Response response)
+    public Optional<AuthenticationResult> get(CallbackRequestModel requestModel, Response response)
+    {
+        return Optional.empty();
+    }
+
+    private Optional<AuthenticationResult> handleCallbackResponse(CallbackRequestModel requestModel)
     {
         validateState(requestModel.getState());
         handleError(requestModel);
@@ -135,15 +147,15 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
                     ContextAttributes.of(contextAttributes));
 
             return Optional.of(new AuthenticationResult(attributes));
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             throw _exceptionFactory.internalServerException(ErrorCode.EXTERNAL_SERVICE_ERROR,
                     "Invalid token " + e.getMessage());
         }
     }
 
-    private Map<String, Object> redeemCodeForTokens(CallbackGetRequestModel requestModel)
+
+    private Map<String, Object> redeemCodeForTokens(CallbackRequestModel requestModel)
     {
         HttpResponse tokenResponse = getWebServiceClient()
                 .withPath("/oauth2/token")
@@ -183,7 +195,7 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         }
     }
 
-    private void handleError(CallbackGetRequestModel requestModel)
+    private void handleError(CallbackRequestModel requestModel)
     {
         if (!Objects.isNull(requestModel.getError()))
         {
@@ -247,8 +259,7 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         try
         {
             return URLEncoder.encode(unencodedString, StandardCharsets.UTF_8.name());
-        }
-        catch (UnsupportedEncodingException e)
+        } catch (UnsupportedEncodingException e)
         {
             throw new RuntimeException("This server cannot support UTF-8!", e);
         }
