@@ -23,11 +23,13 @@ import se.curity.identityserver.sdk.attribute.Attribute;
 import se.curity.identityserver.sdk.authentication.AuthenticationResult;
 import se.curity.identityserver.sdk.authentication.AuthenticatorRequestHandler;
 import se.curity.identityserver.sdk.errors.ErrorCode;
+import se.curity.identityserver.sdk.http.HttpStatus;
 import se.curity.identityserver.sdk.http.RedirectStatusCode;
 import se.curity.identityserver.sdk.service.ExceptionFactory;
 import se.curity.identityserver.sdk.service.authentication.AuthenticatorInformationProvider;
 import se.curity.identityserver.sdk.web.Request;
 import se.curity.identityserver.sdk.web.Response;
+import se.curity.identityserver.sdk.web.alerts.ErrorMessage;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -41,9 +43,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig.Country.Norway.LoginUsing.MOBILE_DEVICE;
+import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig.Country.Sweden.LoginUsing.OTHER_DEVICE;
 import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CALLBACK;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
+import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseModel;
 
-public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestHandler<Request>
+public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestHandler<RequestModel>
 {
     private static final Logger _logger = LoggerFactory.getLogger(CriiptoAuthenticatorRequestHandler.class);
     private final String AUTHORIZATION_ENDPOINT;
@@ -61,9 +68,35 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     }
 
     @Override
-    public Optional<AuthenticationResult> get(Request request, Response response)
+    public Optional<AuthenticationResult> get(RequestModel requestModel, Response response)
     {
         _logger.debug("GET request received for authentication authentication");
+
+        final boolean[] isRedirect = {true};
+        _config.getCountry().getSweden().ifPresent(item ->
+        {
+            if (item.getLoginUsing() == OTHER_DEVICE)
+            {
+                isRedirect[0] = false;
+            }
+        });
+        _config.getCountry().getNorway().ifPresent(item ->
+        {
+            if (item.getLoginUsing() == MOBILE_DEVICE)
+            {
+                isRedirect[0] = false;
+            }
+        });
+
+        if (isRedirect[0])
+        {
+            redirectToAuthorization(requestModel);
+        }
+        return Optional.empty();
+    }
+
+    private void redirectToAuthorization(RequestModel requestModel)
+    {
 
         String redirectUri = createRedirectUri();
         String state = UUID.randomUUID().toString();
@@ -72,6 +105,22 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         Set<String> acrValues = new LinkedHashSet<>(1);
 
         scopes.add("openid");
+
+        _config.getCountry().getSweden().ifPresent(item ->
+        {
+            if (item.getLoginUsing() == OTHER_DEVICE)
+            {
+                scopes.add("sub:" + requestModel.getPostRequestModel().getPersonalNumber());
+            }
+        });
+        _config.getCountry().getNorway().ifPresent(item ->
+        {
+            if (item.getLoginUsing() == MOBILE_DEVICE)
+            {
+                scopes.add("phone:" + requestModel.getPostRequestModel().getPhoneNumber());
+            }
+        });
+
         setAcrValues(acrValues);
 
         _config.getSessionManager().put(Attribute.of("state", state));
@@ -176,14 +225,52 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     }
 
     @Override
-    public Optional<AuthenticationResult> post(Request request, Response response)
+    public Optional<AuthenticationResult> post(RequestModel request, Response response)
     {
-        throw _exceptionFactory.methodNotAllowed();
+        if (request.getPostRequestModel().getPersonalNumber() != null || request.getPostRequestModel().getPhoneNumber() != null)
+        {
+            redirectToAuthorization(request);
+        }
+        return Optional.empty();
+    }
+
+
+    @Override
+    public RequestModel preProcess(Request request, Response response)
+    {
+        if (request.isGetRequest())
+        {
+            // GET request
+            _config.getCountry().getNorway().ifPresent(item ->
+            {
+                if (item.getLoginUsing() == MOBILE_DEVICE)
+                {
+                    response.setResponseModel(templateResponseModel(singletonMap("phoneNumber", _config.getUserPreferenceManager().getUsername()), "authenticate/get"),
+                            Response.ResponseModelScope.NOT_FAILURE);
+                    response.putViewData("selectedForm", "phoneNumber", HttpStatus.OK);
+                }
+            });
+            _config.getCountry().getSweden().ifPresent(item ->
+            {
+                if (item.getLoginUsing() == OTHER_DEVICE)
+                {
+                    response.setResponseModel(templateResponseModel(singletonMap("personalNumber", _config.getUserPreferenceManager().getUsername()), "authenticate/get"),
+                            Response.ResponseModelScope.NOT_FAILURE);
+                    response.putViewData("selectedForm", "personalNumber", HttpStatus.OK);
+                }
+            });
+        }
+
+        // on request validation failure, we should use the same template as for NOT_FAILURE
+        response.setResponseModel(templateResponseModel(emptyMap(),
+                "authenticate/get"), HttpStatus.BAD_REQUEST);
+
+        return new RequestModel(request, response);
     }
 
     @Override
-    public Request preProcess(Request request, Response response)
+    public void onRequestModelValidationFailure(Request request, Response response, Set<ErrorMessage> errorMessages)
     {
-        return request;
+        response.addErrorMessages(errorMessages);
     }
 }

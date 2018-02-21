@@ -1,0 +1,3 @@
+validation.error.phoneNumber.required=You have to enter your phone number
+validation.error.personalNumber.required=You have to enter your personal number (SSN)
+

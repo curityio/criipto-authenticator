@@ -1,0 +1,2 @@
+validation.error.mobileNumber.required=Você deve inserir seu número de telefone
+validation.error.operator.required=Você deve inserir seu número pessoal (SSN)

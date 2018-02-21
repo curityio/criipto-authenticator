@@ -24,6 +24,7 @@ import se.curity.identityserver.sdk.service.ExceptionFactory;
 import se.curity.identityserver.sdk.service.HttpClient;
 import se.curity.identityserver.sdk.service.Json;
 import se.curity.identityserver.sdk.service.SessionManager;
+import se.curity.identityserver.sdk.service.UserPreferenceManager;
 import se.curity.identityserver.sdk.service.WebServiceClientFactory;
 import se.curity.identityserver.sdk.service.authentication.AuthenticatorInformationProvider;
 
@@ -94,6 +95,8 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
         {
         }
     }
+
+    UserPreferenceManager getUserPreferenceManager();
 
     SessionManager getSessionManager();
 
