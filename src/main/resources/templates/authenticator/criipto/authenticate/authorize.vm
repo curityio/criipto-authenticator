@@ -40,11 +40,41 @@
             }
         </script>
 
-    <h3>Open BankId App and verify</h3>
+        <p class="h4 mb4 semibold center" id="poll_message">#message("${_templatePrefix}.view.title")</p>
+
+        <iframe id="autoStart" height="0" width="0" frameborder="0"></iframe>
+
+        <div class="px4 mb4">
+            <div class="loader center">
+                <div class="loader-inner ball-pulse">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
+        <form class="manuallink pb0 display-none">
+            <p class="h4 center">#message("${_templatePrefix}.view.manualstart")</p>
+            <a class="button button-fullwidth button-primary center" id="manualStart" type="submit">
+                #message("${_templatePrefix}.view.button.manualstart")</a>
+        </form>
+        <form name="cancel" action="cancel" class="manuallink display-none" method="get">
+            <button type="submit" class="button button-fullwidth button-danger-outline">#message($_messages,
+                "${_templatePrefix}.view.button.cancel")</button>
+        </form>
+        <form action="$_action" method="post" id="pollingDone" class="display-none">
+            <input type="hidden" name="_pollingDone" value="true"/>
+        </form>
+
+    #parse("authenticator/bankid/launch/bankid-launcher")
 
     <iframe id="iframeId" src="$!authorizeUrl" height="0" width="0"></iframe>
 
     <form id="dataForm" action="$_authUrl/callback" method="post"></form>
+
+    <script src="$_staticResourceRootPath/assets/js/lib/jquery-2.1.4.min.js"></script>
+    <script src="$_staticResourceRootPath/assets/js/curity.js"></script>
 #end
 
 #parse("layouts/default")
