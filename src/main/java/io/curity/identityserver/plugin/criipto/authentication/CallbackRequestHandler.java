@@ -17,7 +17,6 @@
 package io.curity.identityserver.plugin.criipto.authentication;
 
 import io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig;
-import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.curity.identityserver.sdk.Nullable;
@@ -44,6 +43,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -113,13 +113,16 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         try
         {
             //parse claims without need of key
-            Map claimsMap = new JwtConsumerBuilder()
-                    .setSkipAllValidators()
-                    .setDisableRequireSignature()
-                    .setSkipSignatureVerification()
-                    .build()
-                    .processToClaims(tokenResponseData.get("id_token").toString()).getClaimsMap();
+            String[] jwtParts = Objects.toString(tokenResponseData.get("id_token")).split("\\.", 3);
 
+            if (jwtParts.length < 2)
+            {
+                throw _exceptionFactory.internalServerException(ErrorCode.EXTERNAL_SERVICE_ERROR, "Invalid JWT");
+            }
+
+            Base64.Decoder base64Url = Base64.getUrlDecoder();
+            String body = new String(base64Url.decode(jwtParts[1]));
+            Map<String, Object> claimsMap = _json.fromJson(body);
             String[] userId = new String[1]; // Lambdas need data that is effectively final. String isn't; array is.
 
             _config.getCountry().getSweden().ifPresent(sweden ->
