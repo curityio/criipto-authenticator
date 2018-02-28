@@ -59,7 +59,7 @@
             <a class="button button-fullwidth button-primary center" id="manualStart" type="submit">
                 #message("${_templatePrefix}.view.button.manualstart")</a>
         </form>
-        <form name="cancel" action="cancel" class="manuallink display-none" method="get">
+        <form name="cancel" action="$!cancelAction" class="manuallink display-none" method="get">
             <button type="submit" class="button button-fullwidth button-danger-outline">#message($_messages,
                 "${_templatePrefix}.view.button.cancel")</button>
         </form>
@@ -69,7 +69,7 @@
 
     #parse("authenticator/bankid/launch/bankid-launcher")
 
-    <iframe id="iframeId" src="$!authorizeUrl" height="0" width="0"></iframe>
+    <iframe id="iframeId" src="$!authorizeUrl" height="0" width="0" class="display-none"></iframe>
 
     <form id="dataForm" action="$_authUrl/callback" method="post"></form>
 
