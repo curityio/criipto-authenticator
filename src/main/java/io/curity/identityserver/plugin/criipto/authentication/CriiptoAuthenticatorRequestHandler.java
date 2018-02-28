@@ -24,7 +24,6 @@ import se.curity.identityserver.sdk.authentication.AuthenticationResult;
 import se.curity.identityserver.sdk.authentication.AuthenticatorRequestHandler;
 import se.curity.identityserver.sdk.errors.ErrorCode;
 import se.curity.identityserver.sdk.http.HttpStatus;
-import se.curity.identityserver.sdk.http.RedirectStatusCode;
 import se.curity.identityserver.sdk.service.ExceptionFactory;
 import se.curity.identityserver.sdk.service.authentication.AuthenticatorInformationProvider;
 import se.curity.identityserver.sdk.web.Request;
@@ -36,6 +35,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -46,6 +47,7 @@ import java.util.UUID;
 import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig.Country.Norway.LoginUsing.MOBILE_DEVICE;
 import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig.Country.Sweden.LoginUsing.OTHER_DEVICE;
 import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CALLBACK;
+import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CANCEL;
 import static java.util.Collections.emptyMap;
 import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseModel;
 
@@ -69,9 +71,10 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     @Override
     public Optional<AuthenticationResult> get(RequestModel requestModel, Response response)
     {
-        _logger.debug("GET request received for authentication authentication");
+        _logger.debug("GET request received for authentication");
 
-        final boolean[] isRedirect = {true};
+        boolean[] isRedirect = {true};
+
         _config.getCountry().getSweden().ifPresent(item ->
         {
             if (item.getLoginUsing() == OTHER_DEVICE)
@@ -79,6 +82,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 isRedirect[0] = false;
             }
         });
+
         _config.getCountry().getNorway().ifPresent(item ->
         {
             if (item.getLoginUsing() == MOBILE_DEVICE)
@@ -89,14 +93,26 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
         if (isRedirect[0])
         {
-            redirectToAuthorization(requestModel);
+            redirectToAuthorization(requestModel, response);
         }
+
         return Optional.empty();
     }
 
-    private void redirectToAuthorization(RequestModel requestModel)
+    private String buildUrl(String endpoint, Map<String, Collection<String>> queryStringArguments)
     {
+        final Set<String> query = new HashSet<>(queryStringArguments.size());
 
+        queryStringArguments.forEach((key, item) ->
+        {
+            query.add(key + "=" + String.join(" ", item));
+        });
+
+        return endpoint + "?" + String.join("&", query);
+    }
+
+    private void redirectToAuthorization(RequestModel requestModel, Response response)
+    {
         String redirectUri = createRedirectUri();
         String state = UUID.randomUUID().toString();
         Map<String, Collection<String>> queryStringArguments = new LinkedHashMap<>(6);
@@ -135,8 +151,15 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         _logger.debug("Redirecting to {} with query string arguments {}", AUTHORIZATION_ENDPOINT,
                 queryStringArguments);
 
-        throw _exceptionFactory.redirectException(AUTHORIZATION_ENDPOINT,
-                RedirectStatusCode.MOVED_TEMPORARILY, queryStringArguments, false);
+        String authorizeUrl = buildUrl(AUTHORIZATION_ENDPOINT, queryStringArguments);
+
+        Map<String, Object> viewData = new HashMap<>(2);
+
+        viewData.put("authorizeUrl", authorizeUrl);
+        viewData.put("cancelAction", _authenticatorInformationProvider.getFullyQualifiedAuthenticationUri() + "/" + CANCEL);
+
+        response.setResponseModel(templateResponseModel(viewData, "authenticate/authorize"),
+                Response.ResponseModelScope.NOT_FAILURE);
     }
 
     private void setAcrValues(Set<String> acrValues)
@@ -216,7 +239,8 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             URI authUri = _authenticatorInformationProvider.getFullyQualifiedAuthenticationUri();
 
             return new URL(authUri.toURL(), authUri.getPath() + "/" + CALLBACK).toString();
-        } catch (MalformedURLException e)
+        }
+        catch (MalformedURLException e)
         {
             throw _exceptionFactory.internalServerException(ErrorCode.INVALID_REDIRECT_URI,
                     "Could not create redirect URI");
@@ -226,18 +250,20 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     @Override
     public Optional<AuthenticationResult> post(RequestModel request, Response response)
     {
-        if (request.getPostRequestModel().getPersonalNumber() != null || request.getPostRequestModel().getPhoneNumber() != null)
+        if (request.getPostRequestModel().getPersonalNumber() != null ||
+                request.getPostRequestModel().getPhoneNumber() != null)
         {
-            redirectToAuthorization(request);
+            redirectToAuthorization(request, response);
         }
+
         return Optional.empty();
     }
-
 
     @Override
     public RequestModel preProcess(Request request, Response response)
     {
-        final boolean[] showForm = {false};
+        boolean[] showForm = {false};
+
         _config.getCountry().getNorway().ifPresent(item ->
         {
             if (item.getLoginUsing() == MOBILE_DEVICE)
@@ -246,6 +272,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 showForm[0] = true;
             }
         });
+
         _config.getCountry().getSweden().ifPresent(item ->
         {
             if (item.getLoginUsing() == OTHER_DEVICE)
@@ -254,6 +281,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 showForm[0] = true;
             }
         });
+
         if (request.isGetRequest())
         {
             if (showForm[0])

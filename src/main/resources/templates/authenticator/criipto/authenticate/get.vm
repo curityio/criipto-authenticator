@@ -1,5 +1,5 @@
 #*
-*  Copyright 2017 Curity AB
+*  Copyright 2018 Curity AB
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -15,52 +15,51 @@
 *#
 
 #define ($_body)
-
     #if ($_errors.toArray()[0]=='validation.error.personalNumber.required')
         #set($_errorClass = "is-error is-error-danger")
     #end
+
     #if ($_errors.toArray()[0]=='validation.error.phoneNumber.required')
         #set($_errorClass = "is-error is-error-danger")
     #end
 
     #parse("fragments/jquery")
 
-
     #set($isHidden = "hidden")
+
     #if ($error)
         #set($isHidden = "not-hidden")
     #end
-<div class="mt3 px3 lg-px4" id="user-error" $!isHidden>
-    <div class="alert alert-danger px4">
-        $!error<br>
+
+    <div class="mt3 px3 lg-px4" id="user-error" $!isHidden>
+        <div class="alert alert-danger px4">
+            $!error<br>
+        </div>
     </div>
-</div>
 
-<form id="personalNumberForm" method="post" action="$_authUrl">
+    <form id="personalNumberForm" method="post" action="$_authUrl">
+        <div class="sm-col-12 center">
+            <h2>Get started</h2>
+        </div>
 
-    <div class="sm-col-12 center">
-        <h2>Get started</h2>
-    </div>
-    #if ($selectedForm=="personalNumber")
-        <label for="personalNumber" class="$!_errorClass">Enter your personal number</label>
-        <input type="text" id="personalNumber" name="personalNumber" class="block full-width mb1 field-light $!_errorClass"
-               autocapitalize="none"
-               required
-               value="$!personalNumber">
-    #end
-    
-    #if ($selectedForm=="phoneNumber")
-        <label for="phoneNumber" class="$!_errorClass">Enter your phone number</label>
-        <input type="text" id="phoneNumber" name="phoneNumber" class="block full-width mb1 field-light $!_errorClass"
-               autocapitalize="none"
-               required
-               value="$!phoneNumber">
-    #end
+        #if ($selectedForm=="personalNumber")
+            <label for="personalNumber" class="$!_errorClass">Enter your personal number</label>
+            <input type="text" id="personalNumber" name="personalNumber" class="block full-width mb1 field-light $!_errorClass"
+                   autocapitalize="none"
+                   required
+                   value="$!personalNumber">
+        #end
 
+        #if ($selectedForm=="phoneNumber")
+            <label for="phoneNumber" class="$!_errorClass">Enter your phone number</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" class="block full-width mb1 field-light $!_errorClass"
+                   autocapitalize="none"
+                   required
+                   value="$!phoneNumber">
+        #end
 
-    <button type="submit" class="button button-fullwidth button-primary">Continue</button>
-
-</form>
+        <button type="submit" class="button button-fullwidth button-primary">Continue</button>
+    </form>
 #end
 
 #parse("layouts/default")

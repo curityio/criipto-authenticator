@@ -1,3 +1,6 @@
 validation.error.phoneNumber.required=You have to enter your phone number
 validation.error.personalNumber.required=You have to enter your personal number (SSN)
-
+view.title=Login with BankID
+view.manualstart=If the BankID security app doesn't start, click the button below to start it
+view.button.manualstart=Start the BankID security app
+view.button.cancel=Cancel

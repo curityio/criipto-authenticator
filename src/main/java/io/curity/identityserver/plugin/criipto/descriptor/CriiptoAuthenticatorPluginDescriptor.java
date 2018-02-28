@@ -17,6 +17,8 @@
 package io.curity.identityserver.plugin.criipto.descriptor;
 
 import io.curity.identityserver.plugin.criipto.authentication.CallbackRequestHandler;
+import io.curity.identityserver.plugin.criipto.authentication.CancelRequestHandler;
+import io.curity.identityserver.plugin.criipto.authentication.CriiptoAuthenticatorRequestHandler;
 import io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig;
 import se.curity.identityserver.sdk.authentication.AuthenticatorRequestHandler;
 import se.curity.identityserver.sdk.plugin.descriptor.AuthenticatorPluginDescriptor;
@@ -29,6 +31,7 @@ public final class CriiptoAuthenticatorPluginDescriptor
         implements AuthenticatorPluginDescriptor<CriiptoAuthenticatorPluginConfig>
 {
     public final static String CALLBACK = "callback";
+    public final static String CANCEL = "cancel";
 
     @Override
     public String getPluginImplementationType()
@@ -47,7 +50,8 @@ public final class CriiptoAuthenticatorPluginDescriptor
     {
         Map<String, Class<? extends AuthenticatorRequestHandler<?>>> handlers = new LinkedHashMap<>(2);
 
-        handlers.put("index", io.curity.identityserver.plugin.criipto.authentication.CriiptoAuthenticatorRequestHandler.class);
+        handlers.put("index", CriiptoAuthenticatorRequestHandler.class);
+        handlers.put(CANCEL, CancelRequestHandler.class);
         handlers.put(CALLBACK, CallbackRequestHandler.class);
 
         return Collections.unmodifiableMap(handlers);

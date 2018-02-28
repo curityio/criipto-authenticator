@@ -17,7 +17,6 @@
 package io.curity.identityserver.plugin.criipto.authentication;
 
 import io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig;
-import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.curity.identityserver.sdk.Nullable;
@@ -44,12 +43,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CallbackRequestHandler implements AuthenticatorRequestHandler<CallbackGetRequestModel>
+import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseModel;
+
+public class CallbackRequestHandler implements AuthenticatorRequestHandler<CallbackRequestModel>
 {
     private final static Logger _logger = LoggerFactory.getLogger(CallbackRequestHandler.class);
 
@@ -69,26 +71,39 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
     }
 
     @Override
-    public CallbackGetRequestModel preProcess(Request request, Response response)
+    public CallbackRequestModel preProcess(Request request, Response response)
     {
+        CallbackRequestModel requestModel = new CallbackRequestModel(request);
+
         if (request.isGetRequest())
         {
-            return new CallbackGetRequestModel(request);
+            Map<String, Object> data = new HashMap<>(4);
+
+            data.put("code", requestModel.getCode());
+            data.put("state", requestModel.getState());
+            data.put("error", requestModel.getError());
+            data.put("error_description", requestModel.getErrorDescription());
+
+            response.setResponseModel(templateResponseModel(data, "authenticate/callback"),
+                    Response.ResponseModelScope.NOT_FAILURE);
         }
-        else
-        {
-            throw _exceptionFactory.methodNotAllowed();
-        }
+
+        return requestModel;
     }
 
     @Override
-    public Optional<AuthenticationResult> post(CallbackGetRequestModel requestModel, Response response)
+    public Optional<AuthenticationResult> post(CallbackRequestModel requestModel, Response response)
     {
-        throw _exceptionFactory.methodNotAllowed();
+        return handleCallbackResponse(requestModel);
     }
 
     @Override
-    public Optional<AuthenticationResult> get(CallbackGetRequestModel requestModel, Response response)
+    public Optional<AuthenticationResult> get(CallbackRequestModel requestModel, Response response)
+    {
+        return Optional.empty();
+    }
+
+    private Optional<AuthenticationResult> handleCallbackResponse(CallbackRequestModel requestModel)
     {
         validateState(requestModel.getState());
         handleError(requestModel);
@@ -98,13 +113,16 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         try
         {
             //parse claims without need of key
-            Map claimsMap = new JwtConsumerBuilder()
-                    .setSkipAllValidators()
-                    .setDisableRequireSignature()
-                    .setSkipSignatureVerification()
-                    .build()
-                    .processToClaims(tokenResponseData.get("id_token").toString()).getClaimsMap();
+            String[] jwtParts = Objects.toString(tokenResponseData.get("id_token")).split("\\.", 3);
 
+            if (jwtParts.length < 2)
+            {
+                throw _exceptionFactory.internalServerException(ErrorCode.EXTERNAL_SERVICE_ERROR, "Invalid JWT");
+            }
+
+            Base64.Decoder base64Url = Base64.getUrlDecoder();
+            String body = new String(base64Url.decode(jwtParts[1]));
+            Map<String, Object> claimsMap = _json.fromJson(body);
             String[] userId = new String[1]; // Lambdas need data that is effectively final. String isn't; array is.
 
             _config.getCountry().getSweden().ifPresent(sweden ->
@@ -143,7 +161,7 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         }
     }
 
-    private Map<String, Object> redeemCodeForTokens(CallbackGetRequestModel requestModel)
+    private Map<String, Object> redeemCodeForTokens(CallbackRequestModel requestModel)
     {
         HttpResponse tokenResponse = getWebServiceClient()
                 .withPath("/oauth2/token")
@@ -183,7 +201,7 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         }
     }
 
-    private void handleError(CallbackGetRequestModel requestModel)
+    private void handleError(CallbackRequestModel requestModel)
     {
         if (!Objects.isNull(requestModel.getError()))
         {
@@ -254,11 +272,11 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         }
     }
 
-    private void validateState(String state)
+    private void validateState(@Nullable String state)
     {
         @Nullable Attribute sessionAttribute = _config.getSessionManager().get("state");
 
-        if (sessionAttribute != null && state.equals(sessionAttribute.getValueOfType(String.class)))
+        if (state != null && sessionAttribute != null && state.equals(sessionAttribute.getValueOfType(String.class)))
         {
             _logger.debug("State matches session");
         }

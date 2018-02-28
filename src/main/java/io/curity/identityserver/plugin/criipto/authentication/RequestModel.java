@@ -26,10 +26,8 @@ import java.util.Optional;
 
 import static io.curity.identityserver.plugin.criipto.authentication.RequestModel.PhoneModel.MOBILE_NUMBER_PARAM;
 
-
 public final class RequestModel
 {
-
     @Nullable
     @Valid
     private final Post _postRequestModel;
@@ -83,12 +81,10 @@ public final class RequestModel
 
     class PhoneModel implements Post
     {
-
         public static final String MOBILE_NUMBER_PARAM = "phoneNumber";
 
         @NotBlank(message = "validation.error.phoneNumber.required")
         private final String _phoneNumber;
-
 
         PhoneModel(Request request)
         {
@@ -106,7 +102,6 @@ public final class RequestModel
         {
             return null;
         }
-
     }
 
     class SSNModel implements Post
@@ -133,6 +128,5 @@ public final class RequestModel
             return _personalNumber;
         }
     }
-
 }
 
