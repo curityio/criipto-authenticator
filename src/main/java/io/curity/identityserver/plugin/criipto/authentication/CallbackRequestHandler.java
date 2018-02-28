@@ -272,11 +272,11 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         }
     }
 
-    private void validateState(String state)
+    private void validateState(@Nullable String state)
     {
         @Nullable Attribute sessionAttribute = _config.getSessionManager().get("state");
 
-        if (sessionAttribute != null && state.equals(sessionAttribute.getValueOfType(String.class)))
+        if (state != null && sessionAttribute != null && state.equals(sessionAttribute.getValueOfType(String.class)))
         {
             _logger.debug("State matches session");
         }

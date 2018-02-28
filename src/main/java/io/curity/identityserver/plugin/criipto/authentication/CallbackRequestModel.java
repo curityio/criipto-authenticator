@@ -47,6 +47,7 @@ class CallbackRequestModel
         return _code;
     }
 
+    @Nullable
     public String getState()
     {
         return _state;
