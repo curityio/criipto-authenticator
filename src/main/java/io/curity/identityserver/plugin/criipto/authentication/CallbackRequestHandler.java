@@ -74,17 +74,20 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
     public CallbackRequestModel preProcess(Request request, Response response)
     {
         CallbackRequestModel requestModel = new CallbackRequestModel(request);
+
         if (request.isGetRequest())
         {
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("code", requestModel.getCode());
-            dataMap.put("state", requestModel.getState());
-            dataMap.put("error", requestModel.getError());
-            dataMap.put("error_description", requestModel.getErrorDescription());
+            Map<String, Object> data = new HashMap<>(4);
 
-            response.setResponseModel(templateResponseModel(dataMap, "authenticate/callback"),
+            data.put("code", requestModel.getCode());
+            data.put("state", requestModel.getState());
+            data.put("error", requestModel.getError());
+            data.put("error_description", requestModel.getErrorDescription());
+
+            response.setResponseModel(templateResponseModel(data, "authenticate/callback"),
                     Response.ResponseModelScope.NOT_FAILURE);
         }
+
         return requestModel;
     }
 
@@ -147,13 +150,13 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
                     ContextAttributes.of(contextAttributes));
 
             return Optional.of(new AuthenticationResult(attributes));
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             throw _exceptionFactory.internalServerException(ErrorCode.EXTERNAL_SERVICE_ERROR,
                     "Invalid token " + e.getMessage());
         }
     }
-
 
     private Map<String, Object> redeemCodeForTokens(CallbackRequestModel requestModel)
     {
@@ -259,7 +262,8 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
         try
         {
             return URLEncoder.encode(unencodedString, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e)
+        }
+        catch (UnsupportedEncodingException e)
         {
             throw new RuntimeException("This server cannot support UTF-8!", e);
         }

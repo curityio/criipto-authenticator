@@ -73,6 +73,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         _logger.debug("GET request received for authentication authentication");
 
         final boolean[] isRedirect = {true};
+
         _config.getCountry().getSweden().ifPresent(item ->
         {
             if (item.getLoginUsing() == OTHER_DEVICE)
@@ -92,16 +93,19 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         {
             redirectToAuthorization(requestModel, response);
         }
+
         return Optional.empty();
     }
 
     private String buildUrl(String endpoint, Map<String, Collection<String>> queryStringArguments)
     {
-        final Set<String> query = new HashSet<>();
+        final Set<String> query = new HashSet<>(queryStringArguments.size());
+
         queryStringArguments.forEach((key, item) ->
         {
             query.add(key + "=" + String.join(" ", item));
         });
+
         return endpoint + "?" + String.join("&", query);
     }
 
@@ -148,7 +152,8 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
         String authorizeUrl = buildUrl(AUTHORIZATION_ENDPOINT, queryStringArguments);
 
-        response.setResponseModel(templateResponseModel(singletonMap("authorizeUrl", authorizeUrl), "authenticate/authorize"),
+        response.setResponseModel(templateResponseModel(singletonMap("authorizeUrl", authorizeUrl),
+                "authenticate/authorize"),
                 Response.ResponseModelScope.NOT_FAILURE);
     }
 
@@ -229,7 +234,8 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             URI authUri = _authenticatorInformationProvider.getFullyQualifiedAuthenticationUri();
 
             return new URL(authUri.toURL(), authUri.getPath() + "/" + CALLBACK).toString();
-        } catch (MalformedURLException e)
+        }
+        catch (MalformedURLException e)
         {
             throw _exceptionFactory.internalServerException(ErrorCode.INVALID_REDIRECT_URI,
                     "Could not create redirect URI");
@@ -239,18 +245,20 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     @Override
     public Optional<AuthenticationResult> post(RequestModel request, Response response)
     {
-        if (request.getPostRequestModel().getPersonalNumber() != null || request.getPostRequestModel().getPhoneNumber() != null)
+        if (request.getPostRequestModel().getPersonalNumber() != null ||
+                request.getPostRequestModel().getPhoneNumber() != null)
         {
             redirectToAuthorization(request, response);
         }
+
         return Optional.empty();
     }
-
 
     @Override
     public RequestModel preProcess(Request request, Response response)
     {
         final boolean[] showForm = {false};
+
         _config.getCountry().getNorway().ifPresent(item ->
         {
             if (item.getLoginUsing() == MOBILE_DEVICE)
@@ -259,6 +267,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 showForm[0] = true;
             }
         });
+
         _config.getCountry().getSweden().ifPresent(item ->
         {
             if (item.getLoginUsing() == OTHER_DEVICE)
@@ -267,6 +276,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 showForm[0] = true;
             }
         });
+
         if (request.isGetRequest())
         {
             if (showForm[0])
