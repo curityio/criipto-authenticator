@@ -18,33 +18,33 @@
 
 #define ($_body)
     #parse("fragments/jquery")
-<script type="text/javascript" $!nonceAttr>
+        <script type="text/javascript" $!nonceAttr>
 
-    function handleUserData(data) {
-        addField("code", data.code);
-        addField("state", data.state);
-        addField("error", data.error);
-        addField("error_description", data.error_description);
-        $("#dataForm").submit();
-    }
+            function handleUserData(data) {
+                addField("code", data.code);
+                addField("state", data.state);
+                addField("error", data.error);
+                addField("error_description", data.error_description);
 
-    function addField(name, value) {
-        if (value) {
-            var input = $("<input>")
-                    .attr("type", "hidden")
-                    .attr("id", name)
-                    .attr("name", name).val(value);
-            $('#dataForm').append($(input));
-        }
-    }
-</script>
+                $("#dataForm").submit();
+            }
 
-<h3>Open BankId App and verify</h3>
+            function addField(name, value) {
+                if (value) {
+                    var input = $("<input>")
+                            .attr("type", "hidden")
+                            .attr("id", name)
+                            .attr("name", name).val(value);
+                    $('#dataForm').append($(input));
+                }
+            }
+        </script>
 
-<iframe id="iframeId" src="$!authorizeUrl" height="0" width="0"></iframe>
+    <h3>Open BankId App and verify</h3>
 
-<form id="dataForm" action="$_authUrl/callback" method="post">
-</form>
+    <iframe id="iframeId" src="$!authorizeUrl" height="0" width="0"></iframe>
+
+    <form id="dataForm" action="$_authUrl/callback" method="post"></form>
 #end
 
 #parse("layouts/default")

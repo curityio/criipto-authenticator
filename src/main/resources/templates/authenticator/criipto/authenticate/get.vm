@@ -31,35 +31,35 @@
         #set($isHidden = "not-hidden")
     #end
 
-<div class="mt3 px3 lg-px4" id="user-error" $!isHidden>
-    <div class="alert alert-danger px4">
-        $!error<br>
-    </div>
-</div>
-
-<form id="personalNumberForm" method="post" action="$_authUrl">
-    <div class="sm-col-12 center">
-        <h2>Get started</h2>
+    <div class="mt3 px3 lg-px4" id="user-error" $!isHidden>
+        <div class="alert alert-danger px4">
+            $!error<br>
+        </div>
     </div>
 
-    #if ($selectedForm=="personalNumber")
-        <label for="personalNumber" class="$!_errorClass">Enter your personal number</label>
-        <input type="text" id="personalNumber" name="personalNumber" class="block full-width mb1 field-light $!_errorClass"
-               autocapitalize="none"
-               required
-               value="$!personalNumber">
-    #end
-    
-    #if ($selectedForm=="phoneNumber")
-        <label for="phoneNumber" class="$!_errorClass">Enter your phone number</label>
-        <input type="text" id="phoneNumber" name="phoneNumber" class="block full-width mb1 field-light $!_errorClass"
-               autocapitalize="none"
-               required
-               value="$!phoneNumber">
-    #end
+    <form id="personalNumberForm" method="post" action="$_authUrl">
+        <div class="sm-col-12 center">
+            <h2>Get started</h2>
+        </div>
 
-    <button type="submit" class="button button-fullwidth button-primary">Continue</button>
-</form>
+        #if ($selectedForm=="personalNumber")
+            <label for="personalNumber" class="$!_errorClass">Enter your personal number</label>
+            <input type="text" id="personalNumber" name="personalNumber" class="block full-width mb1 field-light $!_errorClass"
+                   autocapitalize="none"
+                   required
+                   value="$!personalNumber">
+        #end
+
+        #if ($selectedForm=="phoneNumber")
+            <label for="phoneNumber" class="$!_errorClass">Enter your phone number</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" class="block full-width mb1 field-light $!_errorClass"
+                   autocapitalize="none"
+                   required
+                   value="$!phoneNumber">
+        #end
+
+        <button type="submit" class="button button-fullwidth button-primary">Continue</button>
+    </form>
 #end
 
 #parse("layouts/default")
