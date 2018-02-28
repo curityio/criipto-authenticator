@@ -15,15 +15,15 @@
 *#
 
 #define ($_body)
-<script type="text/javascript" $!nonceAttr>
-    var data = {}
-    data.code = "$!code";
-    data.state = "$!state";
-    data.error = "$!error";
-    data.error_description = "$!error_description";
+    <script type="text/javascript" $!nonceAttr>
+        var data = {}
+        data.code = "$!code";
+        data.state = "$!state";
+        data.error = "$!error";
+        data.error_description = "$!error_description";
 
-    parent.handleUserData(data);
-</script>
+        parent.handleUserData(data);
+    </script>
 #end
 
 #parse("layouts/default")
