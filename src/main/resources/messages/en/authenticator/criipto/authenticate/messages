@@ -1,4 +1,4 @@
-validation.error.personalNumber.required=You have to enter your personal number (SSN)
+validation.error.personalNumber.required=Personal number required
 view.title=Login with BankID
 meta.title=Login with BankID
 view.manualstart=If the BankID security app doesn't start automatically, you should manually start it now
