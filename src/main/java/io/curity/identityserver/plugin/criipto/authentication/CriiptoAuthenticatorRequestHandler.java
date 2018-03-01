@@ -87,7 +87,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         {
             if (item.getLoginUsing() == MOBILE_DEVICE)
             {
-                isRedirect[0] = false;
+                isRedirect[0] = true;
             }
         });
 
@@ -122,6 +122,10 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
         scopes.add("openid");
 
+        // Set the iframe settings for Denmark up front; they'll be overridden below if some other country was selected
+        viewData.put("iframeHeight", 464);
+        viewData.put("iframeWidth", 320);
+
         _config.getCountry().getSweden().ifPresent(item ->
         {
             viewData.put("iframeHeight", 0);
@@ -139,8 +143,6 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             {
                 viewData.put("iframeHeight", 240);
                 viewData.put("iframeWidth", 388);
-
-                scopes.add("phone:" + requestModel.getPostRequestModel().getPhoneNumber());
             }
             else
             {
@@ -148,13 +150,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 viewData.put("iframeWidth", 500);
             }
         });
-
-        _config.getCountry().getDenmark().ifPresent(ignored ->
-        {
-            viewData.put("iframeHeight", 464);
-            viewData.put("iframeWidth", 320);
-        });
-
+        
         setAcrValues(acrValues);
 
         _config.getSessionManager().put(Attribute.of("state", state));
@@ -239,14 +235,15 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             }
         });
 
-        _config.getCountry().getDenmark().ifPresent(ignored ->
+        if (acrValues.size() == 0)
         {
+            // Assume Denmark
             String acr = "urn:grn:authn:dk:nemid:poces";
 
             _logger.debug("Adding ACR ({}) that will cause Criipto to perform Danish BankID login", acr);
 
             acrValues.add(acr);
-        });
+        }
     }
 
     private String createRedirectUri()
@@ -279,46 +276,26 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     @Override
     public RequestModel preProcess(Request request, Response response)
     {
-        boolean[] showForm = {false};
-
-        _config.getCountry().getNorway().ifPresent(item ->
-        {
-            if (item.getLoginUsing() == MOBILE_DEVICE)
-            {
-                setResponseData(response, "phoneNumber");
-                showForm[0] = true;
-            }
-        });
-
         _config.getCountry().getSweden().ifPresent(item ->
         {
             if (item.getLoginUsing() == OTHER_DEVICE)
             {
-                setResponseData(response, "personalNumber");
-                showForm[0] = true;
+                response.putViewData("selectedForm", "personalNumber", HttpStatus.OK);
+                response.putViewData("selectedForm", "personalNumber", HttpStatus.BAD_REQUEST);
+
+                if (request.isGetRequest())
+                {
+                    response.setResponseModel(templateResponseModel(emptyMap(), "authenticate/get"),
+                            Response.ResponseModelScope.NOT_FAILURE);
+                }
             }
         });
-
-        if (request.isGetRequest())
-        {
-            if (showForm[0])
-            {
-                response.setResponseModel(templateResponseModel(emptyMap(), "authenticate/get"),
-                        Response.ResponseModelScope.NOT_FAILURE);
-            }
-        }
 
         // on request validation failure, we should use the same template as for NOT_FAILURE
         response.setResponseModel(templateResponseModel(emptyMap(),
                 "authenticate/get"), HttpStatus.BAD_REQUEST);
 
         return new RequestModel(request, response);
-    }
-
-    private void setResponseData(Response response, String formValue)
-    {
-        response.putViewData("selectedForm", formValue, HttpStatus.OK);
-        response.putViewData("selectedForm", formValue, HttpStatus.BAD_REQUEST);
     }
 
     @Override
