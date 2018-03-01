@@ -118,22 +118,41 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         Map<String, Collection<String>> queryStringArguments = new LinkedHashMap<>(6);
         Set<String> scopes = new LinkedHashSet<>(2);
         Set<String> acrValues = new LinkedHashSet<>(1);
+        Map<String, Object> viewData = new HashMap<>(4);
 
         scopes.add("openid");
 
         _config.getCountry().getSweden().ifPresent(item ->
         {
+            viewData.put("iframeHeight", 0);
+            viewData.put("iframeWidth", 0);
+
             if (item.getLoginUsing() == OTHER_DEVICE)
             {
                 scopes.add("sub:" + requestModel.getPostRequestModel().getPersonalNumber());
             }
         });
+
         _config.getCountry().getNorway().ifPresent(item ->
         {
             if (item.getLoginUsing() == MOBILE_DEVICE)
             {
+                viewData.put("iframeHeight", 240);
+                viewData.put("iframeWidth", 388);
+
                 scopes.add("phone:" + requestModel.getPostRequestModel().getPhoneNumber());
             }
+            else
+            {
+                viewData.put("iframeHeight", 300);
+                viewData.put("iframeWidth", 500);
+            }
+        });
+
+        _config.getCountry().getDenmark().ifPresent(ignored ->
+        {
+            viewData.put("iframeHeight", 464);
+            viewData.put("iframeWidth", 320);
         });
 
         setAcrValues(acrValues);
@@ -152,8 +171,6 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 queryStringArguments);
 
         String authorizeUrl = buildUrl(AUTHORIZATION_ENDPOINT, queryStringArguments);
-
-        Map<String, Object> viewData = new HashMap<>(2);
 
         viewData.put("authorizeUrl", authorizeUrl);
         viewData.put("cancelAction", _authenticatorInformationProvider.getFullyQualifiedAuthenticationUri() + "/" + CANCEL);
