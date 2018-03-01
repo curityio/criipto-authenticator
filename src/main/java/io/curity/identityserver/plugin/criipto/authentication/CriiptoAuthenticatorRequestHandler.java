@@ -54,7 +54,7 @@ import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseMod
 public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestHandler<RequestModel>
 {
     private static final Logger _logger = LoggerFactory.getLogger(CriiptoAuthenticatorRequestHandler.class);
-    private final String AUTHORIZATION_ENDPOINT;
+    private final String _authorizationEndpoint;
 
     private final CriiptoAuthenticatorPluginConfig _config;
     private final AuthenticatorInformationProvider _authenticatorInformationProvider;
@@ -65,7 +65,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         _config = config;
         _exceptionFactory = config.getExceptionFactory();
         _authenticatorInformationProvider = config.getAuthenticatorInformationProvider();
-        AUTHORIZATION_ENDPOINT = "https://" + _config.getDomain() + "/oauth2/authorize";
+        _authorizationEndpoint = "https://" + _config.getDomain() + "/oauth2/authorize";
     }
 
     @Override
@@ -163,10 +163,10 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         queryStringArguments.put("scope", Collections.singleton(String.join("+", scopes)));
         queryStringArguments.put("acr_values", Collections.singleton(String.join(" ", acrValues)));
 
-        _logger.debug("Redirecting to {} with query string arguments {}", AUTHORIZATION_ENDPOINT,
+        _logger.debug("Redirecting to {} with query string arguments {}", _authorizationEndpoint,
                 queryStringArguments);
 
-        String authorizeUrl = buildUrl(AUTHORIZATION_ENDPOINT, queryStringArguments);
+        String authorizeUrl = buildUrl(_authorizationEndpoint, queryStringArguments);
 
         viewData.put("authorizeUrl", authorizeUrl);
         viewData.put("cancelAction", _authenticatorInformationProvider.getFullyQualifiedAuthenticationUri() + "/" + CANCEL);
