@@ -50,6 +50,7 @@ import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticato
 import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CALLBACK;
 import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CANCEL;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseModel;
 
 public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestHandler<RequestModel>
@@ -82,7 +83,6 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         {
             if (item.getLoginUsing() == OTHER_DEVICE)
             {
-                response.putViewData("username", _userPreferenceManager.getUsername(), HttpStatus.OK);
                 isRedirect[0] = false;
             }
         });
@@ -285,12 +285,11 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         {
             if (item.getLoginUsing() == OTHER_DEVICE)
             {
-                response.putViewData("selectedForm", "personalNumber", HttpStatus.OK);
-                response.putViewData("selectedForm", "personalNumber", HttpStatus.BAD_REQUEST);
-
                 if (request.isGetRequest())
                 {
-                    response.setResponseModel(templateResponseModel(emptyMap(), "authenticate/get"),
+                    response.setResponseModel(templateResponseModel(
+                            singletonMap("personalNumber", _userPreferenceManager.getUsername()),
+                            "authenticate/get"),
                             Response.ResponseModelScope.NOT_FAILURE);
                 }
             }
