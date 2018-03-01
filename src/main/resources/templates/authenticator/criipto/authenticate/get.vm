@@ -38,21 +38,11 @@
     </div>
 
     <form id="personalNumberForm" method="post" action="$_authUrl">
-        #if ($selectedForm == "personalNumber")
-            <label for="personalNumber" class="$!_errorClass">Enter your personal number</label>
-            <input type="text" id="personalNumber" name="personalNumber" class="block full-width mb1 field-light $!_errorClass"
-                   autocapitalize="none"
-                   required
-                   value="$!personalNumber">
-        #end
-
-        #if ($selectedForm == "phoneNumber")
-            <label for="phoneNumber" class="$!_errorClass">Enter your phone number</label>
-            <input type="text" id="phoneNumber" name="phoneNumber" class="block full-width mb1 field-light $!_errorClass"
-                   autocapitalize="none"
-                   required
-                   value="$!phoneNumber">
-        #end
+        <label for="personalNumber" class="$!_errorClass">Enter your personal number</label>
+        <input type="text" id="personalNumber" name="personalNumber" class="block full-width mb1 field-light $!_errorClass"
+               autocapitalize="none"
+               required
+               value="$!personalNumber">
 
         <button type="submit" class="button button-fullwidth button-primary">Continue</button>
     </form>
