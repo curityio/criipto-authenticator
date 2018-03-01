@@ -72,7 +72,7 @@
         #set($displayAttr = 'class="display-none"')
     #end
 
-    <iframe id="iframeId" src="$!authorizeUrl" height="$iframeHeight" width="$iframeWidth" $!displayAttr frameborder="0"></iframe>
+    <iframe id="iframeId" src="$!authorizeUrl" height="$iframeHeight" width="$iframeWidth" $!displayAttr frameborder="0" scrolling="no"></iframe>
 
     <form id="dataForm" action="$_authUrl/callback" method="post"></form>
 
