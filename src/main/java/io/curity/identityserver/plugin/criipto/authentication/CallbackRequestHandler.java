@@ -213,6 +213,13 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
                 throw _exceptionFactory.redirectException(
                         _authenticatorInformationProvider.getAuthenticationBaseUri().toASCIIString());
             }
+            else if ("USER_CANCEL".equals(requestModel.getError()))
+            {
+                _logger.debug("User canceled authentication");
+                
+                throw _exceptionFactory.redirectException(
+                        _authenticatorInformationProvider.getAuthenticationBaseUri().toASCIIString());
+            }
 
             _logger.warn("Got an error from Criipto: {} - {}", requestModel.getError(), requestModel
                     .getErrorDescription());
