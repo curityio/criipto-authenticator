@@ -62,12 +62,10 @@
         <div class="manuallink pb0 display-none">
             <p class="h4 center">#message("${_templatePrefix}.view.manualstart")</p>
         </div>
+
         <form name="cancel" action="$!cancelAction" class="manuallink display-none" method="get">
             <button type="submit" class="button button-fullwidth button-danger-outline">#message($_messages,
                 "${_templatePrefix}.view.button.cancel")</button>
-        </form>
-        <form action="$_action" method="post" id="pollingDone" class="display-none">
-            <input type="hidden" name="_pollingDone" value="true"/>
         </form>
 
     <iframe id="iframeId" src="$!authorizeUrl" height="0" width="0" class="display-none"></iframe>
