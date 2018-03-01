@@ -105,7 +105,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
         queryStringArguments.forEach((key, item) ->
         {
-            query.add(key + "=" + String.join(" ", item));
+            query.add(key + "=" + String.join("+", item));
         });
 
         return endpoint + "?" + String.join("&", query);
@@ -145,7 +145,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         queryStringArguments.put("state", Collections.singleton(state));
         queryStringArguments.put("response_type", Collections.singleton("code"));
 
-        queryStringArguments.put("scope", Collections.singleton(String.join(" ", scopes)));
+        queryStringArguments.put("scope", Collections.singleton(String.join("+", scopes)));
         queryStringArguments.put("acr_values", Collections.singleton(String.join(" ", acrValues)));
 
         _logger.debug("Redirecting to {} with query string arguments {}", AUTHORIZATION_ENDPOINT,
