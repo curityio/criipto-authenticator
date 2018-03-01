@@ -25,6 +25,7 @@ import se.curity.identityserver.sdk.authentication.AuthenticatorRequestHandler;
 import se.curity.identityserver.sdk.errors.ErrorCode;
 import se.curity.identityserver.sdk.http.HttpStatus;
 import se.curity.identityserver.sdk.service.ExceptionFactory;
+import se.curity.identityserver.sdk.service.UserPreferenceManager;
 import se.curity.identityserver.sdk.service.authentication.AuthenticatorInformationProvider;
 import se.curity.identityserver.sdk.web.Request;
 import se.curity.identityserver.sdk.web.Response;
@@ -59,6 +60,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     private final CriiptoAuthenticatorPluginConfig _config;
     private final AuthenticatorInformationProvider _authenticatorInformationProvider;
     private final ExceptionFactory _exceptionFactory;
+    private final UserPreferenceManager _userPreferenceManager;
 
     public CriiptoAuthenticatorRequestHandler(CriiptoAuthenticatorPluginConfig config)
     {
@@ -66,6 +68,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         _exceptionFactory = config.getExceptionFactory();
         _authenticatorInformationProvider = config.getAuthenticatorInformationProvider();
         _authorizationEndpoint = "https://" + _config.getDomain() + "/oauth2/authorize";
+        _userPreferenceManager = config.getUserPreferenceManager();
     }
 
     @Override
@@ -79,6 +82,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         {
             if (item.getLoginUsing() == OTHER_DEVICE)
             {
+                response.putViewData("username", _userPreferenceManager.getUsername(), HttpStatus.OK);
                 isRedirect[0] = false;
             }
         });
@@ -133,7 +137,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
             if (item.getLoginUsing() == OTHER_DEVICE)
             {
-                scopes.add("sub:" + requestModel.getPostRequestModel().getPersonalNumber());
+                scopes.add("sub:" + requestModel.getPersonalNumber());
             }
         });
 
@@ -264,9 +268,10 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
     @Override
     public Optional<AuthenticationResult> post(RequestModel request, Response response)
     {
-        if (request.getPostRequestModel().getPersonalNumber() != null ||
-                request.getPostRequestModel().getPhoneNumber() != null)
+        if (request.getPersonalNumber() != null)
         {
+            _userPreferenceManager.saveUsername(request.getPersonalNumber());
+            
             redirectToAuthorization(request, response);
         }
 
@@ -295,7 +300,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         response.setResponseModel(templateResponseModel(emptyMap(),
                 "authenticate/get"), HttpStatus.BAD_REQUEST);
 
-        return new RequestModel(request, response);
+        return new RequestModel(request);
     }
 
     @Override
