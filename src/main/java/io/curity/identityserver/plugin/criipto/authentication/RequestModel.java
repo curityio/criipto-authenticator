@@ -16,24 +16,33 @@
 
 package io.curity.identityserver.plugin.criipto.authentication;
 
-import org.hibernate.validator.constraints.NotBlank;
 import se.curity.identityserver.sdk.web.Request;
 
-public final class RequestModel
+import javax.validation.constraints.AssertTrue;
+import java.util.Objects;
+
+public class RequestModel
 {
     private static final String PERSONAL_NUMBER_PARAM = "personalNumber";
 
-    @NotBlank(message = "validation.error.personalNumber.required")
     private final String _personalNumber;
+    private final boolean _isGetRequest;
 
     RequestModel(Request request)
     {
         _personalNumber = request.getFormParameterValueOrError(PERSONAL_NUMBER_PARAM);
+        _isGetRequest = request.isGetRequest();
     }
 
     public String getPersonalNumber()
     {
         return _personalNumber;
+    }
+
+    @AssertTrue(message = "validation.error.personalNumber.required")
+    public boolean isValid()
+    {
+        return _isGetRequest || (Objects.nonNull(_personalNumber) && !_personalNumber.isEmpty());
     }
 }
 
