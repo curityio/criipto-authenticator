@@ -18,6 +18,7 @@ package io.curity.identityserver.plugin.criipto.config;
 
 import se.curity.identityserver.sdk.config.Configuration;
 import se.curity.identityserver.sdk.config.OneOf;
+import se.curity.identityserver.sdk.config.annotation.DefaultBoolean;
 import se.curity.identityserver.sdk.config.annotation.DefaultEnum;
 import se.curity.identityserver.sdk.config.annotation.Description;
 import se.curity.identityserver.sdk.service.ExceptionFactory;
@@ -93,6 +94,8 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
 
         interface Denmark
         {
+            @DefaultBoolean(true)
+            boolean isDanish();
         }
     }
 
