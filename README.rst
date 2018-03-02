@@ -9,7 +9,7 @@ This project provides an opens source Criipto Authenticator plug-in for the Curi
 System Requirements
 ~~~~~~~~~~~~~~~~~~~
 
-* Curity Identity Server 2.4.0 and `its system requirements <https://developer.curity.io/docs/latest/system-admin-guide/system-requirements.html>`_. Configuration of all settings in the GUI requires version 3.0.0.
+* Curity Identity Server 3.0.0 and `its system requirements <https://developer.curity.io/docs/latest/system-admin-guide/system-requirements.html>`_.
 
 Requirements for Building from Source
 """""""""""""""""""""""""""""""""""""
@@ -76,7 +76,7 @@ Once the configuration is committed and running, the authenticator can be used l
 Configuration using the CLI
 """""""""""""""""""""""""""
 
-It is very common to create many instances of the Criipto authenticator. For example, you may configure one for Swedish BankID using the same device and another for different devices. These may be put into a group or combined with other authenticators to provide a suite of Scandinavian E-IDs. This can be tedious to configure in the UI. Also, due to a bug in version 2.4.0 of the GUI, it was not possible to configure Danish NemID. For these reasons, you may want to use the CLI to configure instances of this authenticator instead. Doing so is very easy:
+It is very common to create many instances of the Criipto authenticator. For example, you may configure one for Swedish BankID using the same device and another for different devices. These may be put into a group or combined with other authenticators to provide a suite of Scandinavian E-IDs. This can be tedious to configure in the UI, so you may want to use the CLI to configure instances of this authenticator instead. Doing so is very easy:
 
 1. Start the ``idsh`` command (located in ``$IDSVR_HOME/bin``)
 2. Enter configuration mode by typing ``configure`` and hitting Enter.
