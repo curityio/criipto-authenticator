@@ -67,7 +67,7 @@ To configure a new Criipto authenticator using the Curity admin UI, do the follo
 9. Also enter the matching ``Client Secret``.
 10. Specify the domain to be used in the ``Domain`` textfield. This will be the subdomain of ``criipto.id`` or similar.
 11. Choose the country's who's E-ID type should be used. For instance, choose ``sweden`` to use Swedish BankID, ``denmark`` for NemID, and ``norway`` for Norwegian Bank ID.
-10. If ``sweden`` or ``norway`` are chosen, then another dropdown will be displayed allowing for the configuration of authentication using the same device or a different device in the case of Sweden or hardware token or mobile phone in the case of Norway.
+12. If ``sweden`` or ``norway`` are chosen, then another dropdown will be displayed allowing for the configuration of authentication using the same device or a different device in the case of Sweden or hardware token or mobile phone in the case of Norway.
 
 Once all of these changes are made, they will be staged, but not committed (i.e., not running). To make them active, click the ``Commit`` menu option in the ``Changes`` menu. Optionally enter a comment in the ``Deploy Changes`` dialogue and click ``OK``.
 
