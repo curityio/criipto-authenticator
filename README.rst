@@ -53,7 +53,7 @@ To configure a new Criipto authenticator using the Curity admin UI, do the follo
 
     .. note::
 
-        The Criipto-specific configuration is generated dynamically based on the `configuration model defined in the Java interface <https://criipto.com/curityio/criipto-authenticator/blob/master/src/main/java/io/curity/identityserver/plugin/criipto/config/CriiptoAuthenticatorPluginConfig.java>`_.
+        The Criipto-specific configuration is generated dynamically based on the `configuration model defined in the Java interface <https://github.com/curityio/criipto-authenticator/blob/master/src/main/java/io/curity/identityserver/plugin/criipto/config/CriiptoAuthenticatorPluginConfig.java>`_.
 
 6. Certain required and optional configuration settings may be provided. One of these is the ``HTTP Client`` setting. This is the HTTP client that will be used to communicate with the Criipto OAuth server's token and user info endpoints. To define this, do the following:
 
