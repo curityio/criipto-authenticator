@@ -33,6 +33,68 @@ To install this plug-in, either download a binary version available from the `re
 
 For a more detailed explanation of installing plug-ins, refer to the `Curity developer guide <https://developer.curity.io/docs/latest/developer-guide/plugins/index.html#plugin-installation>`_.
 
+Creating an account in Criipto Verify
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Point your browser to the `Criipto Verify product page <https://www.criipto.com/products/criipto-verify/>`_.
+There, you can find links to both the signup page and pricing details for production usage.
+
+.. note:: 
+    Spoiler alert: Creating an account is free, no credit card required.
+    All features are available in the free version - the single restriction is that you can only log in with test identities.
+
+Follow the guide to create a tenant in Criipto Verify, and you will end up on the dashboard:
+
+.. image:: ./docs/images/criipto-verify-dashboard.png
+
+You can find links to blogs and examples there, as well as sign up to Criipto's Slack channel where tech-support is available.
+There is also an chat-feature on the dashboard where you can contact Criipto.
+
+Creating a connection to Curity from Criipto Verify
+"""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Navigate to the Applications tab - this is the place where you define the integration with your Curity server installation.
+
+Click the 'manually' button and give your application a ``Name`` - this is just for display purposes, use whichever value you see fit:
+
+.. image:: ./docs/images/criipto-verify-application-creation.png
+
+Select the domain created for you during signup in the ``Available on domain`` dropdown.
+
+The ``Client ID/Realm`` value is pre-filled with a unique value - you can change it to something more recognizable if you want.
+
+.. note:: This is the value you must register in your Criipto Authenticators ``Client ID`` textfield in Curity (see below).
+
+For the ``Callback URLs`` (multi-line) input, you must add the endpoint in your Curity server where Verify should send the user back to after a successful authentication.
+You can have several values here - and there is no restriction on which DNS domains you can use. But all values used at runtime must be registered here.
+
+.. note:: As an example, if your Curity server is running on the default development URL ``https://localhost:6749``, you must add a ``Callback URL`` value of ``https://localhost:6749/authorize/callback`` 
+
+You can choose to deselect any of the identity schemes that you will not be needing. You can also just leave them all enabled for the purpose of getting the integration set up.
+You can always come back later and change which ones are enabled.
+
+Now, click the ``Save`` button to store the basic configuration of your Curity connection.
+
+The next task is to set up some additional details for the OAuth2 procotol communication between Curity and Criipto Verify.
+
+1. Click on the application you just created:
+    .. figure:: ./docs/images/criipto-verify-curity-application.png
+        :align: center
+    
+    (the application was named ``Curity Server`` here, YMMV if you used another name in the steps above)
+2. Scroll down to the ``OpenID Connect`` section
+3. Click the ``Enable OAuth2 Code Flow`` slider - a dialog pops up with a message about client secret creation. Click ``OK``.
+4. A new dialog shows up, with a freshly generated client secret, and a description about how it must be handled. 
+    .. note:: This is the value that you must set in the ``Client Secret`` textfield in your Criipto Authenticator configuration page in Curity (see below).
+5. Click ``OK``.
+6. Select ``fromTokenEndpoint`` in the ``User info response strategy`` dropdown.
+7. Select ``compact`` in the ``JWT format`` dropdown.
+8. Click ``Save``.
+
+And - that's it for the Criipto Verify part!
+
+Now, you can use the ``Client ID`` and ``Client Secret`` values to set up your Criipto Authenticator in Curity:
+
 Creating a Criipto Authenticator in Curity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
