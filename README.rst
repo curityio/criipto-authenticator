@@ -55,14 +55,14 @@ To configure a new Criipto authenticator using the Curity admin UI, do the follo
 
         The Criipto-specific configuration is generated dynamically based on the `configuration model defined in the Java interface <https://github.com/curityio/criipto-authenticator/blob/master/src/main/java/io/curity/identityserver/plugin/criipto/config/CriiptoAuthenticatorPluginConfig.java>`_.
 
-6. Certain required and optional configuration settings may be provided. One of these is the ``HTTP Client`` setting. This is the HTTP client that will be used to communicate with the Criipto OAuth server's token and user info endpoints. To define this, do the following:
+6. Certain required and optional configuration settings may be provided. One of these optional settings is the ``HTTP Client`` setting. This is the HTTP client that will be used to communicate with the Criipto OAuth server's token and user info endpoints. You may choose to configure this if Curity will communicate with Criipto using a forwarding proxy. To define this, do the following:
 
     A. click the ``Facilities`` button at the top-right of the screen.
     B. Next to ``HTTP``, click ``New``.
     C. Enter some name (e.g., ``criiptoClient``).
     D. Click ``Apply``.
 
-7. Back in the Criipto authenticator instance that you started to define, select the new HTTP client from the dropdown.
+7. Back in the Criipto authenticator instance that you started to define, select the new HTTP client from the dropdown if you configured one; otherwise, skip this setting.
 8. In the ``Client ID`` textfield, enter the client ID from the Criipto app configuration.
 9. Also enter the matching ``Client Secret``.
 10. Specify the domain to be used in the ``Domain`` textfield. This will be the subdomain of ``criipto.id`` or similar.
