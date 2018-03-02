@@ -44,17 +44,16 @@ To configure a new Criipto authenticator using the Curity admin UI, do the follo
 1. Go to the ``Authenticators`` page of the authentication profile wherein the authenticator instance should be created.
 2. Click the ``New Authenticator`` button.
 3. Enter a name (e.g., ``criipto1``). This name needs to match the URI component in the callback URI set in the Criipto app.
-4. For the type, pick the ``Criipto`` option:
+4. For the type, pick the ``Criipto`` option.
+5. On the next page, you can define all of the standard authenticator configuration options like any previous authenticator that should run, the resulting ACR, transformers that should executed, etc. At the bottom of the configuration page, the Criipto-specific options can be found.
 
     .. figure:: docs/images/criipto-authenticator-type-in-curity.png
         :align: center
         :width: 600px
 
-5. On the next page, you can define all of the standard authenticator configuration options like any previous authenticator that should run, the resulting ACR, transformers that should executed, etc. At the bottom of the configuration page, the Criipto-specific options can be found.
-
     .. note::
 
-    The Criipto-specific configuration is generated dynamically based on the `configuration model defined in the Java interface <https://criipto.com/curityio/criipto-authenticator/blob/master/src/main/java/io/curity/identityserver/plugin/criipto/config/CriiptoAuthenticatorPluginConfig.java>`_.
+        The Criipto-specific configuration is generated dynamically based on the `configuration model defined in the Java interface <https://criipto.com/curityio/criipto-authenticator/blob/master/src/main/java/io/curity/identityserver/plugin/criipto/config/CriiptoAuthenticatorPluginConfig.java>`_.
 
 6. Certain required and optional configuration settings may be provided. One of these is the ``HTTP Client`` setting. This is the HTTP client that will be used to communicate with the Criipto OAuth server's token and user info endpoints. To define this, do the following:
 
