@@ -173,6 +173,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         String authorizeUrl = buildUrl(_authorizationEndpoint, queryStringArguments);
 
         viewData.put("authorizeUrl", authorizeUrl);
+        viewData.put("domain", _config.getDomain());
         viewData.put("cancelAction", _authenticatorInformationProvider.getFullyQualifiedAuthenticationUri() + "/" + CANCEL);
 
         response.setResponseModel(templateResponseModel(viewData, "authenticate/authorize"),
