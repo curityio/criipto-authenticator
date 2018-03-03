@@ -84,13 +84,18 @@ The next task is to set up some additional details for the OAuth2 procotol commu
     .. figure:: ./docs/images/criipto-verify-curity-application.png
         :align: center
 2. Scroll down to the ``OpenID Connect`` section
+    .. figure:: ./docs/images/criipto-verify-curity-openid-connect.png
+        :align: center
 3. Click the ``Enable OAuth2 Code Flow`` slider - a dialog pops up with a message about client secret creation. Click ``OK``.
 4. A new dialog shows up, with a freshly generated client secret, and a description about how it must be handled. 
     .. note:: This is the value that you must set in the ``Client Secret`` textfield in your Criipto Authenticator configuration page in Curity (see below).
 5. Click ``OK``.
 6. Select ``fromTokenEndpoint`` in the ``User info response strategy`` dropdown.
 7. Select ``compact`` in the ``JWT format`` dropdown.
-8. Click ``Save``.
+8. Scroll down to the ``Advanced aptions`` section, and enter your Curity servers runtime host (and port, if non-standard) in the ``Frame origin`` textfield. You can find these values on the System -> Deployments page in Curity. Leave out the protocol from the value, Criipto Verify adds that automatically. 
+    .. figure:: ./docs/images/criipto-verify-curity-advanced-options.png
+        :align: center
+9. Click ``Save``.
 
 And - that's it for the Criipto Verify part!
 
