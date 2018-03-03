@@ -159,6 +159,15 @@ It is very common to create many instances of the Criipto authenticator. For exa
 
 For more information on the CLI, refer to this `introductory video <https://developer.curity.io/videos/video/cli-introduction>`_.
 
+Allowing Framing of Criipto
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Criipto authenticator frames the Criipto Verify service, so that the look and feel can be styled using Curity's normal theming mechanisms. In order for this to be allowed by modern browsers, however, all OAuth clients and service provider apps that use this authenticator must be configured to allow framing. The value should be the endpoint of the authentication service's authenticate endpoint with an asterisks appended. For instance, if the authentication service has an authentication endpoint at ``https://id.example.com/authenticate/``, then the apps' allowed framing settings should be updated to include ``https://id.example.com/authenticate/*``, as shown in the following figure:
+
+.. figure:: docs/images/allowed-origins.png
+    :align: center
+    :width: 600px
+
 License
 ~~~~~~~
 

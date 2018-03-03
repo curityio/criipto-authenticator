@@ -14,7 +14,7 @@
 *  limitations under the License.
 *#
 
-#set($_cspChildSrc = "child-src 'self' curity.criipto.id bankid:;")
+#set($_cspChildSrc = "child-src 'self' $domain bankid:;")
 
 #define ($_body)
     #parse("fragments/jquery")
