@@ -240,15 +240,45 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
             }
         });
 
-        if (acrValues.size() == 0)
+        _config.getCountry().getDenmark().ifPresent(danishOption ->
         {
-            // Assume Denmark
-            String acr = "urn:grn:authn:dk:nemid:poces";
+            switch (danishOption.getUserType())
+            {
+                case PRIVATE_CITIZENS:
+                {
+                    String acr = "urn:grn:authn:dk:nemid:poces";
 
-            _logger.debug("Adding ACR ({}) that will cause Criipto to perform Danish BankID login", acr);
+                    _logger.debug("Adding ACR ({}) that will cause Criipto to perform Danish NemID login for " +
+                            "private citizens (i.e., regular banking users)");
 
-            acrValues.add(acr);
-        }
+                    acrValues.add(acr);
+
+                    break;
+                }
+                case EMPLOYEES:
+                {
+                    String acr = "urn:grn:authn:dk:nemid:moces";
+
+                    _logger.debug("Adding ACR ({}) that will cause Criipto to perform Danish NemID login for " +
+                            "banking employees");
+
+                    acrValues.add(acr);
+
+                    break;
+                }
+                case EMPLOYEES_WITH_APP:
+                {
+                    String acr = "urn:grn:authn:dk:nemid:moces:codefile";
+
+                    _logger.debug("Adding ACR ({}) that will cause Criipto to perform Danish NemID login for banking " +
+                            "employees using an installed application");
+
+                    acrValues.add(acr);
+
+                    break;
+                }
+            }
+        });
     }
 
     private String createRedirectUri()

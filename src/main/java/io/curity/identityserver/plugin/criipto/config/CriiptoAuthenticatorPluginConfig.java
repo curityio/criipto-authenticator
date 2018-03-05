@@ -18,7 +18,6 @@ package io.curity.identityserver.plugin.criipto.config;
 
 import se.curity.identityserver.sdk.config.Configuration;
 import se.curity.identityserver.sdk.config.OneOf;
-import se.curity.identityserver.sdk.config.annotation.DefaultBoolean;
 import se.curity.identityserver.sdk.config.annotation.DefaultEnum;
 import se.curity.identityserver.sdk.config.annotation.Description;
 import se.curity.identityserver.sdk.service.ExceptionFactory;
@@ -68,10 +67,12 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
 
             enum LoginUsing
             {
-                @Description("Login on the same device")
+                @Description("Login on the same device (sends 'urn:grn:authn:se:bankid:same-device' ACR value " +
+                        "to Criipto")
                 SAME_DEVICE,
 
-                @Description("Login on some other device")
+                @Description("Login on some other device (sends 'urn:grn:authn:se:bankid:another-device' ACR value " +
+                        "to Criipto")
                 OTHER_DEVICE
             }
         }
@@ -84,18 +85,34 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
 
             enum LoginUsing
             {
-                @Description("Login on a mobile device")
+                @Description("Login on a mobile device (sends 'urn:grn:authn:no:bankid:mobile' ACR value to Criipto)")
                 MOBILE_DEVICE,
 
-                @Description("Login using a hardware token")
+                @Description("Login using a hardware token (sends 'urn:grn:authn:no:bankid:central' ACR value to Criipto")
                 HARDWARE_TOKEN
             }
         }
 
         interface Denmark
         {
-            @DefaultBoolean(true)
-            boolean isDanish();
+            @Description("How the user should login -- either as a regular banking customer or an employee of a " +
+                    "bank or a banking employee using an installed application")
+            @DefaultEnum("PRIVATE_CITIZENS")
+            UserType getUserType();
+
+            enum UserType
+            {
+                @Description("Login private citizens, normal banking customers (sends 'urn:grn:authn:dk:nemid:poces' " +
+                        "ACR value to Criipto")
+                PRIVATE_CITIZENS,
+
+                @Description("Login banking employees (sends 'urn:grn:authn:dk:nemid:moces' ACR value to Criipto)")
+                EMPLOYEES,
+
+                @Description("Login banking employees using an installed application (sends " +
+                        "'urn:grn:authn:dk:nemid:moces:codefile' ACR value to Criipto)")
+                EMPLOYEES_WITH_APP
+            }
         }
     }
 
