@@ -6,7 +6,7 @@
 
     <groupId>io.curity.identityserver.plugin</groupId>
     <artifactId>identityserver.plugins.authenticators.criipto</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-2.4-COMPAT</version>
 
     <name>Criipto Authenticator</name>
 
