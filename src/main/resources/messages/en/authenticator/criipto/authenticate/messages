@@ -1,6 +1,10 @@
 validation.error.personalNumber.required=Personal number required
-view.title=Login with BankID
-meta.title=Login with BankID
+view.title.swedish=Login with Swedish BankID
+view.title.norwegian=Login with Norwegian BankID
+view.title.danish=Login with NemID
+meta.title.swedish=Login with Swedish BankID
+meta.title.norwegian=Login with Norwegian BankID
+meta.title.danish=Login with NemID
 view.manualstart=If the BankID security app doesn't start automatically, you should manually start it now
 view.button.manualstart=Start the BankID security app
 view.button.cancel=Cancel
