@@ -1,5 +1,5 @@
 validation.error.personalNumber.required=Personnummer krävs
-view.title=Logga in med BankID
+view.title=Logga in med
 meta.title=Logga in med BankID
 view.manualstart=Om inte BankID säkerhetsapp startar, starta den nu.
 view.button.manualstart=Starta BankID säkerhetsapp

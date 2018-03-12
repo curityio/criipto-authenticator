@@ -129,11 +129,13 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
         // Set the iframe settings for Denmark up front; they'll be overridden below if some other country was selected
         viewData.put("iframeHeight", 464);
         viewData.put("iframeWidth", 320);
+        viewData.put("country", "NemID");
 
         _config.getCountry().getSweden().ifPresent(item ->
         {
             viewData.put("iframeHeight", 0);
             viewData.put("iframeWidth", 0);
+            viewData.put("country", "Swedish");
 
             if (item.getLoginUsing() == OTHER_DEVICE)
             {
@@ -143,6 +145,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
         _config.getCountry().getNorway().ifPresent(item ->
         {
+            viewData.put("country", "Norwegian");
             if (item.getLoginUsing() == MOBILE_DEVICE)
             {
                 viewData.put("iframeHeight", 240);
