@@ -1,6 +1,10 @@
 validation.error.personalNumber.required=Personnummer krävs
-view.title=Logga in med
-meta.title=Logga in med BankID
+view.title.swedish=Logga in med Svenska BankID
+view.title.norwegian=Logga in med Norwegian BankID
+view.title.danish=Logga in med NemID
+meta.title.swedish=Logga in med Svenska BankID
+meta.title.norwegian=Logga in med Norwegian BankID
+meta.title.danish=Logga in med NemID
 view.manualstart=Om inte BankID säkerhetsapp startar, starta den nu.
 view.button.manualstart=Starta BankID säkerhetsapp
 view.button.cancel=Avbryt
