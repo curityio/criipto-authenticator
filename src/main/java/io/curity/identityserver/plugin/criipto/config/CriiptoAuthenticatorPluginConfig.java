@@ -27,8 +27,8 @@ import se.curity.identityserver.sdk.service.SessionManager;
 import se.curity.identityserver.sdk.service.UserPreferenceManager;
 import se.curity.identityserver.sdk.service.WebServiceClientFactory;
 import se.curity.identityserver.sdk.service.authentication.AuthenticatorInformationProvider;
-import se.curity.identityserver.sdk.service.crypto.SymmetricSignatureVerificationCryptoStore;
-import se.curity.identityserver.sdk.service.crypto.SymmetricSigningCryptoStore;
+import se.curity.identityserver.sdk.service.crypto.AsymmetricSignatureVerificationCryptoStore;
+import se.curity.identityserver.sdk.service.crypto.AsymmetricSigningCryptoStore;
 
 import java.util.Optional;
 
@@ -59,10 +59,10 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
         interface SigningKeys extends OneOf
         {
             @Description("Configure Signing Key")
-            Optional<SymmetricSigningCryptoStore> isConfigureSigningKey();
+            Optional<AsymmetricSigningCryptoStore> isConfigureSigningKey();
 
             @Description("Configure Signature Verification Key")
-            Optional<SymmetricSignatureVerificationCryptoStore> isConfigureSignatureVerificationKey();
+            Optional<AsymmetricSignatureVerificationCryptoStore> isConfigureSignatureVerificationKey();
         }
     }
 
