@@ -27,6 +27,8 @@ import se.curity.identityserver.sdk.service.SessionManager;
 import se.curity.identityserver.sdk.service.UserPreferenceManager;
 import se.curity.identityserver.sdk.service.WebServiceClientFactory;
 import se.curity.identityserver.sdk.service.authentication.AuthenticatorInformationProvider;
+import se.curity.identityserver.sdk.service.crypto.AsymmetricSignatureVerificationCryptoStore;
+import se.curity.identityserver.sdk.service.crypto.AsymmetricSigningCryptoStore;
 
 import java.util.Optional;
 
@@ -46,6 +48,24 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
     @Description("The domain or tenant ID at Criipto")
     String getDomain();
 
+
+    @Description("Use Sessionless State")
+    Optional<SessionlessState> isUseSessionlessState();
+
+    interface SessionlessState
+    {
+        SigningKeys sigingKeys();
+
+        interface SigningKeys extends OneOf
+        {
+            @Description("Configure Signing Key")
+            Optional<AsymmetricSigningCryptoStore> isConfigureSigningKey();
+
+            @Description("Configure Signature Verification Key")
+            Optional<AsymmetricSignatureVerificationCryptoStore> isConfigureSignatureVerificationKey();
+        }
+    }
+
     Country getCountry();
 
     interface Country extends OneOf
@@ -58,7 +78,7 @@ public interface CriiptoAuthenticatorPluginConfig extends Configuration
 
         @Description("Login using NemID")
         Optional<Denmark> getDenmark();
-        
+
         interface Sweden
         {
             @Description("How the user should login -- either on the same device or another device")
