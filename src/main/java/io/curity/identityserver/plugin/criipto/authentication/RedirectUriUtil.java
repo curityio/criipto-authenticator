@@ -9,9 +9,13 @@ import java.net.URL;
 
 import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CALLBACK;
 
-public class RedirectUriUtil
+final class RedirectUriUtil
 {
-    public static String createRedirectUri(AuthenticatorInformationProvider authenticatorInformationProvider, ExceptionFactory exceptionFactory)
+    private RedirectUriUtil()
+    {
+    }
+
+    static String createRedirectUri(AuthenticatorInformationProvider authenticatorInformationProvider, ExceptionFactory exceptionFactory)
     {
         try
         {
