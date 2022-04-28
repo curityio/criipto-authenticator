@@ -12,13 +12,13 @@ This project provides an opens source Criipto Authenticator plug-in for the Curi
 System Requirements
 ~~~~~~~~~~~~~~~~~~~
 
-* Curity Identity Server, at least version 6.5.0 and `its system requirements <https://developer.curity.io/docs/latest/system-admin-guide/system-requirements.html>`_.
+* Curity Identity Server, at least version 7.0.2 and `its system requirements <https://developer.curity.io/docs/latest/system-admin-guide/system-requirements.html>`_.
 
 Requirements for Building from Source
 """""""""""""""""""""""""""""""""""""
 
 * Maven 3
-* Java JDK v. 11 or later
+* Java JDK v. 17 or later
 
 Compiling the Plug-in from Source
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,7 +39,7 @@ For a more detailed explanation of installing plug-ins, refer to the `Curity dev
 Creating an account in Criipto Verify
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Point your browser to the `Criipto Verify product page <https://www.criipto.com/products/criipto-verify/>`_.
+Point your browser to the `Criipto Verify product page <https://www.criipto.com/>`_.
 There, you can find links to both the signup page and pricing details for production usage.
 
 .. note:: 

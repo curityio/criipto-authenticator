@@ -16,9 +16,9 @@
 
 package io.curity.identityserver.plugin.criipto.authentication;
 
+import jakarta.validation.constraints.AssertTrue;
 import se.curity.identityserver.sdk.web.Request;
 
-import javax.validation.constraints.AssertTrue;
 import java.util.Objects;
 
 public class RequestModel

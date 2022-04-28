@@ -31,9 +31,6 @@ import se.curity.identityserver.sdk.web.Request;
 import se.curity.identityserver.sdk.web.Response;
 import se.curity.identityserver.sdk.web.alerts.ErrorMessage;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,9 +42,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static io.curity.identityserver.plugin.criipto.authentication.RedirectUriUtil.createRedirectUri;
 import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig.Country.Norway.LoginUsing.MOBILE_DEVICE;
 import static io.curity.identityserver.plugin.criipto.config.CriiptoAuthenticatorPluginConfig.Country.Sweden.LoginUsing.OTHER_DEVICE;
-import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CALLBACK;
 import static io.curity.identityserver.plugin.criipto.descriptor.CriiptoAuthenticatorPluginDescriptor.CANCEL;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
@@ -117,7 +114,7 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
 
     private void redirectToAuthorization(RequestModel requestModel, Response response)
     {
-        String redirectUri = createRedirectUri();
+        String redirectUri = createRedirectUri(_authenticatorInformationProvider, _exceptionFactory);
         String state = UUID.randomUUID().toString();
         Map<String, Collection<String>> queryStringArguments = new LinkedHashMap<>(6);
         Set<String> scopes = new LinkedHashSet<>(2);
@@ -282,21 +279,6 @@ public class CriiptoAuthenticatorRequestHandler implements AuthenticatorRequestH
                 }
             }
         });
-    }
-
-    private String createRedirectUri()
-    {
-        try
-        {
-            URI authUri = _authenticatorInformationProvider.getFullyQualifiedAuthenticationUri();
-
-            return new URL(authUri.toURL(), authUri.getPath() + "/" + CALLBACK).toString();
-        }
-        catch (MalformedURLException e)
-        {
-            throw _exceptionFactory.internalServerException(ErrorCode.INVALID_REDIRECT_URI,
-                    "Could not create redirect URI");
-        }
     }
 
     @Override
