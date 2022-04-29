@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static io.curity.identityserver.plugin.criipto.authentication.RedirectUriUtil.createRedirectUri;
 import static se.curity.identityserver.sdk.web.ResponseModel.templateResponseModel;
 
 public class CallbackRequestHandler implements AuthenticatorRequestHandler<CallbackRequestModel>
@@ -163,12 +164,14 @@ public class CallbackRequestHandler implements AuthenticatorRequestHandler<Callb
 
     private Map<String, Object> redeemCodeForTokens(CallbackRequestModel requestModel)
     {
+        var redirectUri = createRedirectUri(_authenticatorInformationProvider, _exceptionFactory);
+
         HttpResponse tokenResponse = getWebServiceClient()
                 .withPath("/oauth2/token")
                 .request()
                 .contentType("application/x-www-form-urlencoded")
                 .body(getFormEncodedBodyFrom(createPostData(_config.getClientId(), _config.getClientSecret(),
-                        requestModel.getCode(), requestModel.getRequestUrl())))
+                        requestModel.getCode(), redirectUri)))
                 .method("POST")
                 .response();
         int statusCode = tokenResponse.statusCode();
